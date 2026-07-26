@@ -14,8 +14,8 @@
 </body>
 <h1>我的相册</h1>
 <div class="album">
-    <img src="DJI_0263.JPG" onclick="showBig(this.src)">
-    <img src="DJI_0277.JPG" onclick="showBig(this.src)">
+    <img src="1.jpg" onclick="showBig(this.src)">
+    <img src="2.jpg" onclick="showBig(this.src)">
     <img src="3.jpg" onclick="showBig(this.src)">
     <img src="4.jpg" onclick="showBig(this.src)">
     <img src="5.jpg" onclick="showBig(this.src)">
