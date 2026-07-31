@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>可拖拽窗口 + 日历</title>
   <style>
-    /* ---------- 窗口样式 ---------- */
     #win {
       position: fixed;
       width: 340px;
@@ -20,8 +19,6 @@
       z-index: 999;
       user-select: none; /* 防止整体选中 */
     }
-
-    /* 标题栏（拖动手柄） */
     #bar {
       height: 44px;
       background: linear-gradient(135deg, #667eea, #764ba2);
@@ -39,14 +36,11 @@
       cursor: grabbing;
     }
 
-    /* 内容区域 */
     #content {
       padding: 20px 18px 24px;
       background: #fafafa;
       border-top: 1px solid #eee;
     }
-
-    /* ---------- 日历样式 ---------- */
     #calendar {
       width: 100%;
       max-width: 280px;
@@ -54,7 +48,6 @@
       font-family: inherit;
       text-align: center;
     }
-
     .cal-header {
       display: flex;
       justify-content: space-between;
@@ -80,7 +73,6 @@
     .cal-header button:hover {
       background: #ddd;
     }
-
     #calendar table {
       width: 100%;
       border-collapse: collapse;
@@ -116,7 +108,6 @@
       color: #ccc;
       pointer-events: none; /* 不可点击非当月日期 */
     }
-
     #cal-info {
       text-align: center;
       margin-top: 12px;
@@ -126,7 +117,6 @@
   </style>
 </head>
 <body>
-
   <!-- ========== 可拖拽窗口 ========== -->
   <div id="win">
     <!-- 标题栏（拖动手柄） -->
@@ -141,14 +131,12 @@
       <div id="cal-info">点击日期可选中</div>
     </div>
   </div>
-
   <!-- ========== JavaScript ========== -->
   <script>
     // ---------- 拖拽逻辑（独立） ----------
     (function() {
       const win = document.getElementById('win');
       let offsetX = 0, offsetY = 0;
-
       // 暴露给全局（用于 onmousedown）
       window.startDrag = function(e) {
         e.preventDefault();
@@ -160,7 +148,6 @@
           win.style.left = e.clientX - offsetX + 'px';
           win.style.top = e.clientY - offsetY + 'px';
         };
-
         document.onmouseup = function() {
           document.onmousemove = null;
           document.onmouseup = null;
@@ -178,7 +165,6 @@
       function renderCalendar(year, month) {
         currentYear = year;
         currentMonth = month;
-
         const firstDay = new Date(year, month, 1).getDay(); // 0=周日
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const daysInPrevMonth = new Date(year, month, 0).getDate();
@@ -187,7 +173,6 @@
         const todayDate = today.getDate();
         const todayMonth = today.getMonth();
         const todayYear = today.getFullYear();
-
         let html = `
           <div class="cal-header">
             <button onclick="window.calPrev()">‹</button>
@@ -200,13 +185,11 @@
             </tr></thead>
             <tbody><tr>
         `;
-
         // 上月填充（灰色）
         for (let i = 0; i < firstDay; i++) {
           const day = daysInPrevMonth - firstDay + i + 1;
           html += `<td class="other-month">${day}</td>`;
         }
-
         // 当月日期
         for (let d = 1; d <= daysInMonth; d++) {
           const isToday = (d === todayDate && month === todayMonth && year === todayYear);
@@ -222,17 +205,14 @@
             html += `</tr><tr>`;
           }
         }
-
         // 补全剩余格子（下月开头）
         const totalCells = firstDay + daysInMonth;
         const remain = (7 - totalCells % 7) % 7;
         for (let i = 1; i <= remain; i++) {
           html += `<td class="other-month">${i}</td>`;
         }
-
         html += `</tr></tbody></table>`;
         calDiv.innerHTML = html;
-
         // 更新底部提示信息
         if (selectedDate) {
           infoDiv.textContent = `已选：${selectedDate.getFullYear()}年${selectedDate.getMonth()+1}月${selectedDate.getDate()}日`;
@@ -240,7 +220,6 @@
           infoDiv.textContent = '点击日期可选中';
         }
       }
-
       // 上一月
       window.calPrev = function() {
         if (currentMonth === 0) {
@@ -264,13 +243,11 @@
         selectedDate = new Date(year, month, day);
         renderCalendar(currentYear, currentMonth); // 重新渲染以高亮
       };
-
       // 初始化：显示当前月份
       const now = new Date();
       renderCalendar(now.getFullYear(), now.getMonth());
     })();
   </script>
-
 </body>
 </body>
   <body>
@@ -294,12 +271,10 @@
     <img src="5.JPG" onclick="showBig(this.src)">
     <img src="6.JPG" onclick="showBig(this.src)">
 </div>
-
 <div class="mask" id="mask">
     <span class="close" onclick="closeBig()">×</span>
     <img src="" id="bigImg">
 </div>
-
 <style>
 .album{
     display: grid;
@@ -343,7 +318,6 @@
     cursor: pointer;
 }
 </style>
-
 <script>
 function showBig(src){
     document.getElementById("bigImg").src = src;
