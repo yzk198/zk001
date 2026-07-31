@@ -80,4 +80,9 @@ function closeBig(){
     document.getElementById("mask").style.display = "none";
 }
 </script>
+<div id=c style="position:fixed;top:10px;right:10px;background:#000;color:#fff;padding:8px 16px;border-radius:20px;font:18px monospace;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.3)"></div>
+<script>
+c.innerText = new Date().toLocaleString('zh-CN', { hour12: false });
+setInterval(() => c.innerText = new Date().toLocaleString('zh-CN', { hour12: false }), 1000);
+</script>
 </html>
