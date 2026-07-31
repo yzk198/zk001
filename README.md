@@ -287,12 +287,12 @@
 </body>
 <h1>我的相册</h1>
 <div class="album">
-    <img src="1.jpg" onclick="showBig(this.src)">
-    <img src="2.jpg" onclick="showBig(this.src)">
-    <img src="3.jpg" onclick="showBig(this.src)">
-    <img src="4.jpg" onclick="showBig(this.src)">
-    <img src="5.jpg" onclick="showBig(this.src)">
-    <img src="6.jpg" onclick="showBig(this.src)">
+    <img src="1.JPG" onclick="showBig(this.src)">
+    <img src="2.JPG" onclick="showBig(this.src)">
+    <img src="3.JPG" onclick="showBig(this.src)">
+    <img src="4.JPG" onclick="showBig(this.src)">
+    <img src="5.JPG" onclick="showBig(this.src)">
+    <img src="6.JPG" onclick="showBig(this.src)">
 </div>
 
 <div class="mask" id="mask">
