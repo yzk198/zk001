@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>可拖拽窗口 + 日历</title>
   <style>
+    /* ===== 可拖动日历窗口样式 ===== */
     #win {
       position: fixed;
       width: 340px;
@@ -17,7 +17,7 @@
       font-family: system-ui, -apple-system, sans-serif;
       overflow: hidden;
       z-index: 999;
-      user-select: none; /* 防止整体选中 */
+      user-select: none;
     }
     #bar {
       height: 44px;
@@ -35,7 +35,6 @@
     #bar:active {
       cursor: grabbing;
     }
-
     #content {
       padding: 20px 18px 24px;
       background: #fafafa;
@@ -106,7 +105,7 @@
     }
     #calendar td.other-month {
       color: #ccc;
-      pointer-events: none; /* 不可点击非当月日期 */
+      pointer-events: none;
     }
     #cal-info {
       text-align: center;
@@ -114,35 +113,103 @@
       font-size: 0.8rem;
       color: #888;
     }
+
+    /* ===== 相册样式 ===== */
+    .album {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      padding: 20px;
+    }
+    .album img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .album img:hover {
+      transform: scale(1.03);
+    }
+    .mask {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    .mask img {
+      max-width: 90%;
+      max-height: 90vh;
+      border-radius: 8px;
+    }
+    .close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: white;
+      font-size: 40px;
+      cursor: pointer;
+    }
   </style>
 </head>
-<body>
-  <!-- ========== 可拖拽窗口 ========== -->
+<body style="background-color: #c9ffcf">
+
+  <!-- ========== 可拖拽日历窗口 ========== -->
   <div id="win">
-    <!-- 标题栏（拖动手柄） -->
     <div id="bar" onmousedown="startDrag(event)">
       <span>✧ 拖动我</span>
       <span style="font-size:0.8rem;opacity:0.8;">📅</span>
     </div>
-
-    <!-- 内容区域（放置日历） -->
     <div id="content">
       <div id="calendar"></div>
       <div id="cal-info">点击日期可选中</div>
     </div>
   </div>
+
+  <!-- ========== 页面内容 ========== -->
+  <h1>Welcome to my OS</h1>
+  <h2>Introduction</h2>
+  <p>Hello world</p>
+
+  (rest of your content)
+  <a href="https://stardance.hackclub.com/amd">label</a>
+
+  <!-- your content -->
+
+  <h1>我的相册</h1>
+  <div class="album">
+    <img src="1.JPG" onclick="showBig(this.src)">
+    <img src="2.JPG" onclick="showBig(this.src)">
+    <img src="3.JPG" onclick="showBig(this.src)">
+    <img src="4.JPG" onclick="showBig(this.src)">
+    <img src="5.JPG" onclick="showBig(this.src)">
+    <img src="6.JPG" onclick="showBig(this.src)">
+  </div>
+  <div class="mask" id="mask">
+    <span class="close" onclick="closeBig()">×</span>
+    <img src="" id="bigImg">
+  </div>
+
+  <!-- ========== 右上角时钟 ========== -->
+  <div id="c" style="position:fixed;top:10px;right:10px;background:#000;color:#fff;padding:8px 16px;border-radius:20px;font:18px monospace;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.3)"></div>
+
   <!-- ========== JavaScript ========== -->
   <script>
-    // ---------- 拖拽逻辑（独立） ----------
+    // ---------- 拖拽逻辑 ----------
     (function() {
       const win = document.getElementById('win');
       let offsetX = 0, offsetY = 0;
-      // 暴露给全局（用于 onmousedown）
       window.startDrag = function(e) {
         e.preventDefault();
         offsetX = e.clientX - win.offsetLeft;
         offsetY = e.clientY - win.offsetTop;
-
         document.onmousemove = function(e) {
           e.preventDefault();
           win.style.left = e.clientX - offsetX + 'px';
@@ -155,17 +222,17 @@
       };
     })();
 
-    // ---------- 日历逻辑（独立） ----------
+    // ---------- 日历逻辑 ----------
     (function() {
       const calDiv = document.getElementById('calendar');
       const infoDiv = document.getElementById('cal-info');
       let currentYear, currentMonth;
-      let selectedDate = null; // 保存选中的日期对象
+      let selectedDate = null;
 
       function renderCalendar(year, month) {
         currentYear = year;
         currentMonth = month;
-        const firstDay = new Date(year, month, 1).getDay(); // 0=周日
+        const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const daysInPrevMonth = new Date(year, month, 0).getDate();
 
@@ -173,6 +240,7 @@
         const todayDate = today.getDate();
         const todayMonth = today.getMonth();
         const todayYear = today.getFullYear();
+
         let html = `
           <div class="cal-header">
             <button onclick="window.calPrev()">‹</button>
@@ -185,11 +253,13 @@
             </tr></thead>
             <tbody><tr>
         `;
-        // 上月填充（灰色）
+
+        // 上月填充
         for (let i = 0; i < firstDay; i++) {
           const day = daysInPrevMonth - firstDay + i + 1;
           html += `<td class="other-month">${day}</td>`;
         }
+
         // 当月日期
         for (let d = 1; d <= daysInMonth; d++) {
           const isToday = (d === todayDate && month === todayMonth && year === todayYear);
@@ -200,27 +270,28 @@
           const cls = (isToday ? 'today' : '') + (isSelected ? ' selected' : '');
           html += `<td class="${cls}" onclick="window.calSelect(${year}, ${month}, ${d})">${d}</td>`;
 
-          // 每7个换行（不是最后一行）
           if ((firstDay + d - 1) % 7 === 6 && d < daysInMonth) {
             html += `</tr><tr>`;
           }
         }
-        // 补全剩余格子（下月开头）
+
+        // 下月填充
         const totalCells = firstDay + daysInMonth;
         const remain = (7 - totalCells % 7) % 7;
         for (let i = 1; i <= remain; i++) {
           html += `<td class="other-month">${i}</td>`;
         }
+
         html += `</tr></tbody></table>`;
         calDiv.innerHTML = html;
-        // 更新底部提示信息
+
         if (selectedDate) {
           infoDiv.textContent = `已选：${selectedDate.getFullYear()}年${selectedDate.getMonth()+1}月${selectedDate.getDate()}日`;
         } else {
           infoDiv.textContent = '点击日期可选中';
         }
       }
-      // 上一月
+
       window.calPrev = function() {
         if (currentMonth === 0) {
           renderCalendar(currentYear - 1, 11);
@@ -229,7 +300,6 @@
         }
       };
 
-      // 下一月
       window.calNext = function() {
         if (currentMonth === 11) {
           renderCalendar(currentYear + 1, 0);
@@ -238,98 +308,31 @@
         }
       };
 
-      // 选择日期
       window.calSelect = function(year, month, day) {
         selectedDate = new Date(year, month, day);
-        renderCalendar(currentYear, currentMonth); // 重新渲染以高亮
+        renderCalendar(currentYear, currentMonth);
       };
-      // 初始化：显示当前月份
+
       const now = new Date();
       renderCalendar(now.getFullYear(), now.getMonth());
     })();
+
+    // ---------- 相册功能 ----------
+    function showBig(src) {
+      document.getElementById("bigImg").src = src;
+      document.getElementById("mask").style.display = "flex";
+    }
+    function closeBig() {
+      document.getElementById("mask").style.display = "none";
+    }
+
+    // ---------- 时钟功能 ----------
+    const c = document.getElementById('c');
+    c.innerText = new Date().toLocaleString('zh-CN', { hour12: false });
+    setInterval(() => {
+      c.innerText = new Date().toLocaleString('zh-CN', { hour12: false });
+    }, 1000);
   </script>
+
 </body>
-</body>
-  <body>
-  <h1>Welcome to my OS
-  <h2>Introduction</h2>
-  <p>Hello world</p>
-  </body>
-  <body>
-  (rest of your content)
-  <a href="https://stardance.hackclub.com/amd">label</a>
-</body>
-<body style="background-color: #c9ffcf">
-  // your content//
-</body>
-<h1>我的相册</h1>
-<div class="album">
-    <img src="1.JPG" onclick="showBig(this.src)">
-    <img src="2.JPG" onclick="showBig(this.src)">
-    <img src="3.JPG" onclick="showBig(this.src)">
-    <img src="4.JPG" onclick="showBig(this.src)">
-    <img src="5.JPG" onclick="showBig(this.src)">
-    <img src="6.JPG" onclick="showBig(this.src)">
-</div>
-<div class="mask" id="mask">
-    <span class="close" onclick="closeBig()">×</span>
-    <img src="" id="bigImg">
-</div>
-<style>
-.album{
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    gap: 15px;
-    padding: 20px;
-}
-.album img{
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-.album img:hover{
-    transform: scale(1.03);
-}
-.mask{
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.85);
-    display: none;
-    justify-content: center;
-    align-items: center;
-}
-.mask img{
-    max-width: 90%;
-    max-height: 90vh;
-    border-radius: 8px;
-}
-.close{
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    color: white;
-    font-size: 40px;
-    cursor: pointer;
-}
-</style>
-<script>
-function showBig(src){
-    document.getElementById("bigImg").src = src;
-    document.getElementById("mask").style.display = "flex";
-}
-function closeBig(){
-    document.getElementById("mask").style.display = "none";
-}
-</script>
-<div id=c style="position:fixed;top:10px;right:10px;background:#000;color:#fff;padding:8px 16px;border-radius:20px;font:18px monospace;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.3)"></div>
-<script>
-c.innerText = new Date().toLocaleString('zh-CN', { hour12: false });
-setInterval(() => c.innerText = new Date().toLocaleString('zh-CN', { hour12: false }), 1000);
-</script>
 </html>
