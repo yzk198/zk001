@@ -1,17 +1,13 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>可拖拽窗口 + 日历</title>
-
-  <!-- ============================================================
-       【模块1：可拖拽日历窗口 - 样式】
-       功能：定义悬浮窗口的外观、位置、阴影效果，以及日历的整体样式
-       包括：窗口容器、拖拽标题栏、内容区、日历表格、日期高亮等
-       ============================================================ -->
+  <title>Interactive Web OS</title>
   <style>
-    /* 日历窗口容器 - 固定定位、圆角、阴影 */
+    /* ============================================
+       MODULE 1: Draggable Calendar Window
+       ============================================ */
     #win {
       position: fixed;
       width: 340px;
@@ -23,9 +19,8 @@
       font-family: system-ui, -apple-system, sans-serif;
       overflow: hidden;
       z-index: 999;
-      user-select: none; /* 防止拖动时选中文字 */
+      user-select: none; /* Prevent text selection during drag */
     }
-    /* 窗口标题栏 - 渐变背景、拖动手柄 */
     #bar {
       height: 44px;
       background: linear-gradient(135deg, #667eea, #764ba2);
@@ -42,13 +37,11 @@
     #bar:active {
       cursor: grabbing;
     }
-    /* 窗口内容区域 */
     #content {
       padding: 20px 18px 24px;
       background: #fafafa;
       border-top: 1px solid #eee;
     }
-    /* 日历容器 */
     #calendar {
       width: 100%;
       max-width: 280px;
@@ -56,7 +49,6 @@
       font-family: inherit;
       text-align: center;
     }
-    /* 日历头部（年月 + 左右切换按钮） */
     .cal-header {
       display: flex;
       justify-content: space-between;
@@ -82,7 +74,6 @@
     .cal-header button:hover {
       background: #ddd;
     }
-    /* 日历表格 */
     #calendar table {
       width: 100%;
       border-collapse: collapse;
@@ -105,23 +96,19 @@
     #calendar td:hover {
       background: #f0f0f0;
     }
-    /* 今天日期高亮 */
     #calendar td.today {
       background: #667eea;
       color: #fff;
       font-weight: 600;
     }
-    /* 选中日期高亮 */
     #calendar td.selected {
       background: #764ba2;
       color: #fff;
     }
-    /* 非当月日期（灰色、不可点击） */
     #calendar td.other-month {
       color: #ccc;
-      pointer-events: none;
+      pointer-events: none; /* Non-current month dates are not clickable */
     }
-    /* 日历底部提示信息 */
     #cal-info {
       text-align: center;
       margin-top: 12px;
@@ -129,16 +116,16 @@
       color: #888;
     }
 
-    /* ============================================================
-       【模块2：相册 - 样式】
-       功能：定义相册网格布局、缩略图样式、大图遮罩层效果
-       包括：3列网格、图片悬停放大、全屏遮罩预览
-       ============================================================ */
+    /* ============================================
+       MODULE 2: Photo Gallery
+       ============================================ */
     .album {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 15px;
       padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
     }
     .album img {
       width: 100%;
@@ -151,7 +138,6 @@
     .album img:hover {
       transform: scale(1.03);
     }
-    /* 大图预览遮罩层 */
     .mask {
       position: fixed;
       top: 0;
@@ -162,14 +148,13 @@
       display: none;
       justify-content: center;
       align-items: center;
-      z-index: 2000;
+      z-index: 1000;
     }
     .mask img {
       max-width: 90%;
       max-height: 90vh;
       border-radius: 8px;
     }
-    /* 关闭按钮 */
     .close {
       position: absolute;
       top: 20px;
@@ -178,48 +163,64 @@
       font-size: 40px;
       cursor: pointer;
     }
+
+    /* ============================================
+       MODULE 3: Live Clock
+       ============================================ */
+    #clock {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: #000;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font: 18px monospace;
+      z-index: 999;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Page layout */
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    h1 {
+      text-align: center;
+      padding: 20px;
+      color: #333;
+    }
   </style>
 </head>
+<body>
 
-<body style="background-color: #c9ffcf">
-
-  <!-- ============================================================
-       【模块1：可拖拽日历窗口 - HTML结构】
-       功能：提供窗口的DOM结构，包含标题栏（可拖拽）和日历内容区
-       ============================================================ -->
+  <!-- ============================================
+       MODULE 1: Draggable Calendar Window
+       A floating window that can be dragged around
+       the screen. Contains an interactive calendar
+       with month navigation and date selection.
+       ============================================ -->
   <div id="win">
-    <!-- 标题栏 - 按住这里可以拖动整个窗口 -->
+    <!-- Title bar — acts as the drag handle -->
     <div id="bar" onmousedown="startDrag(event)">
-      <span>✧ 拖动我</span>
+      <span>✧ Drag Me</span>
       <span style="font-size:0.8rem;opacity:0.8;">📅</span>
     </div>
-    <!-- 内容区 - 日历动态渲染到这里 -->
+    <!-- Content area — holds the calendar -->
     <div id="content">
       <div id="calendar"></div>
-      <div id="cal-info">点击日期可选中</div>
+      <div id="cal-info">Click a date to select</div>
     </div>
   </div>
 
-  <!-- ============================================================
-       【模块3：实时时钟 - HTML结构】
-       功能：在页面右上角显示当前日期和时间（24小时制）
-       ============================================================ -->
-  <div id="c" style="position:fixed;top:10px;right:10px;background:#000;color:#fff;padding:8px 16px;border-radius:20px;font:18px monospace;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.3)"></div>
-
-  <!-- ============================================================
-       【页面内容区】
-       ============================================================ -->
-  <h1>Welcome to my OS</h1>
-  <h2>Introduction</h2>
-  <p>Hello world</p>
-  <p>(rest of your content)</p>
-  <a href="https://stardance.hackclub.com/amd">label</a>
-
-  <!-- ============================================================
-       【模块2：相册 - HTML结构】
-       功能：展示6张图片缩略图，点击可放大预览
-       ============================================================ -->
-  <h1>我的相册</h1>
+  <!-- ============================================
+       MODULE 2: Photo Gallery
+       A responsive grid of photos. Clicking any
+       thumbnail opens a full-screen lightbox view.
+       ============================================ -->
+  <h1>Photo Gallery</h1>
   <div class="album">
     <img src="1.JPG" onclick="showBig(this.src)">
     <img src="2.JPG" onclick="showBig(this.src)">
@@ -228,33 +229,32 @@
     <img src="5.JPG" onclick="showBig(this.src)">
     <img src="6.JPG" onclick="showBig(this.src)">
   </div>
-  <!-- 大图预览遮罩层 -->
   <div class="mask" id="mask">
     <span class="close" onclick="closeBig()">×</span>
     <img src="" id="bigImg">
   </div>
 
-  <!-- ============================================================
-       【JavaScript 脚本区】
-       ============================================================ -->
-  <script>
+  <!-- ============================================
+       MODULE 3: Live Clock
+       A real-time digital clock displayed in the
+       top-right corner, updated every second.
+       ============================================ -->
+  <div id="clock"></div>
 
-    // ============================================================
-    // 【模块1a：拖拽逻辑】
-    // 功能：实现窗口的鼠标拖拽移动
-    // 原理：按下标题栏时记录偏移量，鼠标移动时更新窗口位置
-    // ============================================================
+  <!-- ============================================
+       JavaScript
+       ============================================ -->
+  <script>
+    /* ---------- Draggable Window Logic ---------- */
     (function() {
       const win = document.getElementById('win');
       let offsetX = 0, offsetY = 0;
 
-      // 开始拖动（暴露给全局供 onmousedown 调用）
+      // Start dragging — record the offset between cursor and window top-left
       window.startDrag = function(e) {
         e.preventDefault();
-        // 计算鼠标相对于窗口左上角的偏移量
         offsetX = e.clientX - win.offsetLeft;
         offsetY = e.clientY - win.offsetTop;
-        // 绑定鼠标移动和松开事件
         document.onmousemove = function(e) {
           e.preventDefault();
           win.style.left = e.clientX - offsetX + 'px';
@@ -267,26 +267,22 @@
       };
     })();
 
-    // ============================================================
-    // 【模块1b：日历逻辑】
-    // 功能：动态生成月历，支持上下月切换、日期选中、今日高亮
-    // 原理：根据年月计算当月天数和首日星期，拼接HTML表格渲染
-    // ============================================================
+    /* ---------- Calendar Logic ---------- */
     (function() {
       const calDiv = document.getElementById('calendar');
       const infoDiv = document.getElementById('cal-info');
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                          'July', 'August', 'September', 'October', 'November', 'December'];
       let currentYear, currentMonth;
-      let selectedDate = null; // 保存用户选中的日期
+      let selectedDate = null; // Currently selected date
 
-      // 核心：渲染指定年月的日历
+      // Render the calendar for a given year and month
       function renderCalendar(year, month) {
         currentYear = year;
         currentMonth = month;
-
-        const firstDay = new Date(year, month, 1).getDay();       // 当月第一天是星期几
-        const daysInMonth = new Date(year, month + 1, 0).getDate(); // 当月总天数
-        const daysInPrevMonth = new Date(year, month, 0).getDate(); // 上月总天数
-
+        const firstDay = new Date(year, month, 1).getDay(); // 0 = Sunday
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const daysInPrevMonth = new Date(year, month, 0).getDate();
         const today = new Date();
         const todayDate = today.getDate();
         const todayMonth = today.getMonth();
@@ -295,23 +291,23 @@
         let html = `
           <div class="cal-header">
             <button onclick="window.calPrev()">‹</button>
-            <span>${year}年 ${month + 1}月</span>
+            <span>${monthNames[month]} ${year}</span>
             <button onclick="window.calNext()">›</button>
           </div>
           <table>
             <thead><tr>
-              <th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th>
+              <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
             </tr></thead>
             <tbody><tr>
         `;
 
-        // 上月末尾日期填充（灰色）
+        // Fill leading cells with previous month's dates (gray)
         for (let i = 0; i < firstDay; i++) {
           const day = daysInPrevMonth - firstDay + i + 1;
           html += `<td class="other-month">${day}</td>`;
         }
 
-        // 当月日期
+        // Render current month dates
         for (let d = 1; d <= daysInMonth; d++) {
           const isToday = (d === todayDate && month === todayMonth && year === todayYear);
           const isSelected = selectedDate &&
@@ -320,13 +316,13 @@
                             year === selectedDate.getFullYear();
           const cls = (isToday ? 'today' : '') + (isSelected ? ' selected' : '');
           html += `<td class="${cls}" onclick="window.calSelect(${year}, ${month}, ${d})">${d}</td>`;
-          // 每7个换行
+          // New row every 7 days
           if ((firstDay + d - 1) % 7 === 6 && d < daysInMonth) {
             html += `</tr><tr>`;
           }
         }
 
-        // 下月开头日期填充（灰色）
+        // Fill trailing cells with next month's dates (gray)
         const totalCells = firstDay + daysInMonth;
         const remain = (7 - totalCells % 7) % 7;
         for (let i = 1; i <= remain; i++) {
@@ -336,15 +332,15 @@
         html += `</tr></tbody></table>`;
         calDiv.innerHTML = html;
 
-        // 更新底部选中提示
+        // Update info bar text
         if (selectedDate) {
-          infoDiv.textContent = `已选：${selectedDate.getFullYear()}年${selectedDate.getMonth()+1}月${selectedDate.getDate()}日`;
+          infoDiv.textContent = `Selected: ${monthNames[selectedDate.getMonth()]} ${selectedDate.getDate()}, ${selectedDate.getFullYear()}`;
         } else {
-          infoDiv.textContent = '点击日期可选中';
+          infoDiv.textContent = 'Click a date to select';
         }
       }
 
-      // 上一月
+      // Navigate to previous month
       window.calPrev = function() {
         if (currentMonth === 0) {
           renderCalendar(currentYear - 1, 11);
@@ -353,7 +349,7 @@
         }
       };
 
-      // 下一月
+      // Navigate to next month
       window.calNext = function() {
         if (currentMonth === 11) {
           renderCalendar(currentYear + 1, 0);
@@ -362,21 +358,18 @@
         }
       };
 
-      // 选中日期
+      // Select a specific date
       window.calSelect = function(year, month, day) {
         selectedDate = new Date(year, month, day);
-        renderCalendar(currentYear, currentMonth); // 重新渲染以高亮
+        renderCalendar(currentYear, currentMonth); // Re-render to show highlight
       };
 
-      // 初始化：显示当前月份
+      // Initialize with current month
       const now = new Date();
       renderCalendar(now.getFullYear(), now.getMonth());
     })();
 
-    // ============================================================
-    // 【模块2：相册大图预览逻辑】
-    // 功能：点击缩略图显示全屏大图，点击关闭按钮或遮罩层关闭
-    // ============================================================
+    /* ---------- Photo Gallery Logic ---------- */
     function showBig(src) {
       document.getElementById("bigImg").src = src;
       document.getElementById("mask").style.display = "flex";
@@ -385,16 +378,12 @@
       document.getElementById("mask").style.display = "none";
     }
 
-    // ============================================================
-    // 【模块3：实时时钟逻辑】
-    // 功能：每秒更新一次，显示当前日期和时间（24小时制）
-    // ============================================================
-    const clockEl = document.getElementById('c');
-    clockEl.innerText = new Date().toLocaleString('zh-CN', { hour12: false });
+    /* ---------- Live Clock Logic ---------- */
+    const clockEl = document.getElementById('clock');
+    clockEl.innerText = new Date().toLocaleString('en-US', { hour12: false });
     setInterval(() => {
-      clockEl.innerText = new Date().toLocaleString('zh-CN', { hour12: false });
+      clockEl.innerText = new Date().toLocaleString('en-US', { hour12: false });
     }, 1000);
-
   </script>
 </body>
 </html>
