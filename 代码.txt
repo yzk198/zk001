@@ -1,496 +1,344 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <!--
-    ============================================================
-    My OS - Interactive Desktop v2.0
-    ============================================================
-    Description: A multi-functional interactive web page featuring
-                 a draggable calendar window, photo gallery, and
-                 real-time clock display.
-    Features:
-        1. Draggable Window - Click and drag the title bar to move
-        2. Interactive Calendar - Month navigation, date selection
-        3. Photo Gallery - Click thumbnails to view full-size images
-        4. Real-time Clock - Live date and time display
-        5. Hover Effects - Smooth animations on interactive elements
-    Dependencies: None (pure HTML, CSS, JavaScript)
-    ============================================================
-    -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Draggable Window + Calendar</title>
-    
-    <style>
-        /* ================================================
-           Draggable Window Styles
-           ================================================ */
-        
-        /* Main draggable window container */
-        #win {
-            position: fixed;
-            width: 340px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-            top: 60px;
-            left: 60px;
-            font-family: system-ui, -apple-system, sans-serif;
-            overflow: hidden;
-            z-index: 999;
-            user-select: none;  /* Prevent text selection during drag */
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>毛玻璃 · 控制中心 + 搜索</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);font-family:system-ui,-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;padding:20px;transition:background-image .4s}
 
-        /* Window title bar (drag handle) */
-        #bar {
-            height: 44px;
-            background: linear-gradient(135deg, #667eea, #764ba2);  /* Purple gradient */
-            color: #fff;
-            line-height: 44px;
-            padding: 0 20px;
-            cursor: grab;         /* Grab cursor when hovering */
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+/* 中央搜索框（独立，毛玻璃，支持网页搜索） */
+.search-center{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:460px;
+  max-width:90vw;
+  z-index:1000;
+  background:rgba(10,15,30,.45);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-radius:60px;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+  padding:6px 6px 6px 22px;
+  display:flex;
+  align-items:center;
+  transition:box-shadow .3s;
+}
+.search-center:focus-within{
+  box-shadow:0 0 40px rgba(0,200,255,.1),0 20px 60px rgba(0,0,0,.5);
+}
+.search-center input{
+  flex:1;
+  padding:14px 0;
+  border:none;
+  background:transparent;
+  color:#f0f4ff;
+  font-size:1rem;
+  outline:none;
+}
+.search-center input::placeholder{
+  color:rgba(200,215,255,.4);
+}
+.search-center button{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  color:#c8d6f0;
+  padding:8px 20px;
+  border-radius:40px;
+  font-size:.9rem;
+  cursor:pointer;
+  transition:.2s;
+  backdrop-filter:blur(4px);
+}
+.search-center button:hover{
+  background:rgba(0,200,255,.15);
+  border-color:rgba(0,200,255,.3);
+}
 
-        /* Cursor changes to grabbing while dragging */
-        #bar:active {
-            cursor: grabbing;
-        }
+/* 可拖拽窗口（控制中心） */
+#win{
+  position:fixed;
+  width:360px;
+  background:rgba(10,15,30,.55);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-radius:24px;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+  top:60px;
+  left:60px;
+  overflow:hidden;
+  z-index:999;
+  user-select:none;
+}
+#bar{
+  height:46px;
+  background:rgba(255,255,255,.04);
+  color:#d0e0ff;
+  line-height:46px;
+  padding:0 20px;
+  cursor:grab;
+  display:flex;
+  justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  font-weight:500;
+}
+#bar:active{cursor:grabbing}
+#bar span:last-child{opacity:.5}
+#content{padding:20px 18px 24px;color:#c8d6f0}
 
-        /* Window content area */
-        #content {
-            padding: 20px 18px 24px;
-            background: #fafafa;
-            border-top: 1px solid #eee;
-        }
+.image-zone{
+  margin-bottom:22px;
+  border:2px dashed rgba(255,255,255,.15);
+  border-radius:16px;
+  padding:12px;
+  text-align:center;
+  cursor:pointer;
+  min-height:100px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.02);
+  transition:.3s;
+}
+.image-zone:hover{
+  border-color:rgba(0,200,255,.3);
+  background:rgba(255,255,255,.05);
+}
+.image-zone .hint{color:rgba(200,215,255,.4);font-size:.85rem}
+.image-zone .hint span{display:block;font-size:2rem;margin-bottom:4px}
+.image-zone img{max-width:100%;max-height:160px;border-radius:10px;display:none}
+.image-zone img.show{display:block}
+.image-zone .action-bar{display:none;gap:10px;margin-top:8px;flex-wrap:wrap;justify-content:center}
+.image-zone .action-bar.show{display:flex}
+.image-zone .action-bar button{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  color:#c8d6f0;
+  padding:4px 16px;
+  border-radius:30px;
+  font-size:.75rem;
+  cursor:pointer;
+  transition:.2s;
+}
+.image-zone .action-bar button:hover{
+  background:rgba(0,200,255,.15);
+  border-color:rgba(0,200,255,.3);
+}
+#fileInput{display:none}
 
-        /* ================================================
-           Calendar Styles
-           ================================================ */
-        
-        /* Calendar container */
-        #calendar {
-            width: 100%;
-            max-width: 280px;
-            margin: 0 auto;
-            font-family: inherit;
-            text-align: center;
-        }
+#calendar{
+  width:100%;
+  max-width:280px;
+  margin:0 auto;
+  text-align:center;
+}
+.cal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:600;
+  font-size:1rem;
+  color:#b6ceff;
+  margin-bottom:12px;
+}
+.cal-header button{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
+  width:32px;
+  height:32px;
+  border-radius:30px;
+  font-size:1.2rem;
+  color:#a0c0ff;
+  cursor:pointer;
+  transition:.2s;
+}
+.cal-header button:hover{
+  background:rgba(0,255,255,.12);
+  border-color:rgba(0,255,255,.2);
+}
+#calendar table{width:100%;border-collapse:collapse;table-layout:fixed}
+#calendar th{
+  font-size:.65rem;
+  color:rgba(180,200,255,.4);
+  font-weight:500;
+  padding:6px 0;
+  letter-spacing:1px;
+}
+#calendar td{
+  padding:7px 0;
+  font-size:.9rem;
+  text-align:center;
+  cursor:pointer;
+  border-radius:30px;
+  transition:.15s;
+  color:#c8d6f0;
+}
+#calendar td:hover:not(.other-month){background:rgba(255,255,255,.06)}
+#calendar td.today{
+  background:rgba(0,200,255,.15);
+  color:#fff;
+  font-weight:600;
+}
+#calendar td.selected{
+  background:linear-gradient(135deg,#00d4ff,#a855f7);
+  color:#fff;
+  font-weight:600;
+  box-shadow:0 0 24px rgba(0,212,255,.15);
+}
+#calendar td.other-month{
+  color:rgba(255,255,255,.12);
+  pointer-events:none;
+}
+#cal-info{
+  text-align:center;
+  margin-top:14px;
+  font-size:.75rem;
+  color:rgba(180,200,255,.35);
+  border-top:1px solid rgba(255,255,255,.04);
+  padding-top:12px;
+}
 
-        /* Calendar header (month + navigation buttons) */
-        .cal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        /* Prev/Next month navigation buttons */
-        .cal-header button {
-            background: #eee;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .cal-header button:hover {
-            background: #ddd;
-        }
-
-        /* Calendar table */
-        #calendar table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
-
-        /* Day name headers (Sun, Mon, etc.) */
-        #calendar th {
-            font-size: 0.75rem;
-            color: #888;
-            font-weight: 500;
-            padding: 6px 0;
-        }
-
-        /* Date cells */
-        #calendar td {
-            padding: 6px 0;
-            font-size: 0.9rem;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: background 0.15s;
-        }
-
-        #calendar td:hover {
-            background: #f0f0f0;
-        }
-
-        /* Today's date highlight */
-        #calendar td.today {
-            background: #667eea;
-            color: #fff;
-            font-weight: 600;
-        }
-
-        /* Selected date highlight */
-        #calendar td.selected {
-            background: #764ba2;
-            color: #fff;
-        }
-
-        /* Dates from other months (greyed out) */
-        #calendar td.other-month {
-            color: #ccc;
-            pointer-events: none;  /* Non-clickable */
-        }
-
-        /* Calendar info text below calendar */
-        #cal-info {
-            text-align: center;
-            margin-top: 12px;
-            font-size: 0.8rem;
-            color: #888;
-        }
-
-        /* ================================================
-           Photo Gallery Styles
-           ================================================ */
-        
-        /* Photo gallery grid container */
-        .album {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);  /* 3 equal columns */
-            gap: 15px;
-            padding: 20px;
-        }
-
-        /* Gallery thumbnail images */
-        .album img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        /* Hover scale effect */
-        .album img:hover {
-            transform: scale(1.03);
-        }
-
-        /* ================================================
-           Lightbox / Modal Styles
-           ================================================ */
-        
-        /* Fullscreen image overlay */
-        .mask {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.85);  /* 85% black */
-            display: none;                      /* Hidden by default */
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Enlarged image in modal */
-        .mask img {
-            max-width: 90%;
-            max-height: 90vh;
-            border-radius: 8px;
-        }
-
-        /* Close button in modal */
-        .close {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: white;
-            font-size: 40px;
-            cursor: pointer;
-        }
-
-        /* ================================================
-           Real-Time Clock Styles
-           ================================================ */
-        
-        /* Clock display */
-        #clock {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: #000;
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font: 18px monospace;
-            z-index: 999;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
-        }
-    </style>
+#clock{
+  position:fixed;
+  bottom:28px;
+  right:28px;
+  background:rgba(0,0,0,.5);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  color:#9effb0;
+  padding:8px 20px;
+  border-radius:40px;
+  font:16px 'SF Mono','Fira Code',monospace;
+  border:1px solid rgba(0,255,200,.08);
+  box-shadow:0 8px 30px rgba(0,0,0,.4);
+  z-index:999;
+  letter-spacing:.3px;
+}
+</style>
 </head>
-<body style="background-color: #c9ffcf; margin: 0;">
+<body>
 
-    <!-- ================================================
-         Draggable Window with Calendar
-         ================================================ -->
-    <div id="win">
-        <!-- Title bar (drag handle) -->
-        <div id="bar" onmousedown="startDrag(event)">
-            <span>✧ Drag Me</span>
-            <span style="font-size:0.8rem;opacity:0.8;">📅</span>
-        </div>
-        
-        <!-- Window content: calendar -->
-        <div id="content">
-            <div id="calendar"></div>
-            <div id="cal-info">Click a date to select</div>
-        </div>
+<!-- 中央搜索框（独立，支持网页搜索） -->
+<form class="search-center" action="https://www.baidu.com/s" target="_blank" method="get">
+  <input type="text" name="wd" placeholder="🔍 搜索网页（百度）..." />
+  <button type="submit">搜索</button>
+</form>
+
+<!-- 可拖拽窗口（控制中心） -->
+<div id="win">
+  <div id="bar" onmousedown="startDrag(event)">
+    <span>✧ 控制中心</span>
+    <span>🪟</span>
+  </div>
+  <div id="content">
+    <div class="image-zone" id="imageZone" onclick="document.getElementById('fileInput').click()">
+      <div class="hint" id="hintText"><span>🖼️</span>点击插入图片</div>
+      < img id="previewImg" src="" alt="预览" />
+      <div class="action-bar" id="actionBar">
+        <button onclick="setAsBackground()">设为背景</button>
+        <button onclick="removeImage()">移除</button>
+      </div>
     </div>
+    <input type="file" id="fileInput" accept="image/*" onchange="handleImage(event)" />
+    <div id="calendar"></div>
+    <div id="cal-info">点击日期选中</div>
+  </div>
+</div>
 
-    <!-- ================================================
-         Photo Gallery
-         ================================================ -->
-    <h1 style="text-align: center; padding: 20px;">My Photo Album</h1>
-    
-    <div class="album">
-        <img src="1.JPG" onclick="showBig(this.src)">
-        <img src="2.JPG" onclick="showBig(this.src)">
-        <img src="3.JPG" onclick="showBig(this.src)">
-        <img src="4.JPG" onclick="showBig(this.src)">
-        <img src="5.JPG" onclick="showBig(this.src)">
-        <img src="6.JPG" onclick="showBig(this.src)">
-    </div>
+<div id="clock"></div>
 
-    <!-- Lightbox modal for enlarged images -->
-    <div class="mask" id="mask">
-        <span class="close" onclick="closeBig()">×</span>
-        <img src="" id="bigImg">
-    </div>
+<script>
+// 1. 窗口拖拽
+(function(){
+  const win=document.getElementById('win');
+  let ox=0,oy=0;
+  window.startDrag=function(e){
+    e.preventDefault();
+    ox=e.clientX-win.offsetLeft;
+    oy=e.clientY-win.offsetTop;
+    document.onmousemove=function(e){
+      e.preventDefault();
+      win.style.left=e.clientX-ox+'px';
+      win.style.top=e.clientY-oy+'px';
+    };
+    document.onmouseup=function(){
+      document.onmousemove=null;
+      document.onmouseup=null;
+    };
+  };
+})();
 
-    <!-- ================================================
-         Real-Time Clock
-         ================================================ -->
-    <div id="clock"></div>
+// 2. 日历
+(function(){
+  const cal=document.getElementById('calendar'), info=document.getElementById('cal-info');
+  let year, month, sel=null;
+  function render(y,m){
+    year=y; month=m;
+    const first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate(), prev=new Date(y,m,0).getDate();
+    const t=new Date(), td=t.getDate(), tm=t.getMonth(), ty=t.getFullYear();
+    let html=`<div class="cal-header"><button onclick="window.calPrev()">‹</button><span>${y}年 ${m+1}月</span><button onclick="window.calNext()">›</button></div><table><thead><tr><th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th></tr></thead><tbody><tr>`;
+    for(let i=0;i<first;i++){ const d=prev-first+i+1; html+=`<td class="other-month">${d}</td>`; }
+    for(let d=1;d<=days;d++){
+      const isToday=d===td&&m===tm&&y===ty;
+      const isSel=sel && d===sel.getDate() && m===sel.getMonth() && y===sel.getFullYear();
+      const cls=(isToday?'today':'')+(isSel?' selected':'');
+      html+=`<td class="${cls}" onclick="window.calSelect(${y},${m},${d})">${d}</td>`;
+      if((first+d-1)%7===6 && d<days) html+=`</tr><tr>`;
+    }
+    const rem=(7-(first+days)%7)%7;
+    for(let i=1;i<=rem;i++) html+=`<td class="other-month">${i}</td>`;
+    html+=`</tr></tbody></table>`;
+    cal.innerHTML=html;
+    info.textContent=sel?`已选：${sel.getFullYear()}/${sel.getMonth()+1}/${sel.getDate()}`:'点击日期选中';
+  }
+  window.calPrev=function(){ if(month===0) render(year-1,11); else render(year,month-1); };
+  window.calNext=function(){ if(month===11) render(year+1,0); else render(year,month+1); };
+  window.calSelect=function(y,m,d){ sel=new Date(y,m,d); render(year,month); };
+  const n=new Date(); render(n.getFullYear(),n.getMonth());
+})();
 
-    <script>
-        /* ================================================
-           Window Drag Logic
-           IIFE (Immediately Invoked Function Expression)
-           ================================================ */
-        
-        (function() {
-            const win = document.getElementById('win');
-            let offsetX = 0, offsetY = 0;
+// 3. 时钟
+const clock=document.getElementById('clock');
+setInterval(()=>{ clock.textContent=new Date().toLocaleString('zh-CN',{hour12:false}); },1000);
+clock.textContent=new Date().toLocaleString('zh-CN',{hour12:false});
 
-            /**
-             * Start dragging the window
-             * Calculates offset between mouse position and window position
-             * @param {MouseEvent} e - Mouse down event
-             */
-            window.startDrag = function(e) {
-                e.preventDefault();
-                offsetX = e.clientX - win.offsetLeft;
-                offsetY = e.clientY - win.offsetTop;
-
-                // Track mouse movement
-                document.onmousemove = function(e) {
-                    e.preventDefault();
-                    win.style.left = e.clientX - offsetX + 'px';
-                    win.style.top = e.clientY - offsetY + 'px';
-                };
-
-                // Stop dragging on mouse release
-                document.onmouseup = function() {
-                    document.onmousemove = null;
-                    document.onmouseup = null;
-                };
-            };
-        })();
-
-        /* ================================================
-           Calendar Logic
-           IIFE (Immediately Invoked Function Expression)
-           ================================================ */
-        
-        (function() {
-            const calDiv = document.getElementById('calendar');
-            const infoDiv = document.getElementById('cal-info');
-            let currentYear, currentMonth;
-            let selectedDate = null;  // Stores the currently selected date
-
-            /**
-             * Render the calendar for a given month and year
-             * Generates the full calendar HTML with navigation and date grid
-             * @param {number} year - The year to display
-             * @param {number} month - The month to display (0-11)
-             */
-            function renderCalendar(year, month) {
-                currentYear = year;
-                currentMonth = month;
-
-                // Calculate calendar data
-                const firstDay = new Date(year, month, 1).getDay();  // 0 = Sunday
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                const daysInPrevMonth = new Date(year, month, 0).getDate();
-                
-                // Get today's date for highlighting
-                const today = new Date();
-                const todayDate = today.getDate();
-                const todayMonth = today.getMonth();
-                const todayYear = today.getFullYear();
-
-                // Start building HTML
-                let html = `
-                    <div class="cal-header">
-                        <button onclick="window.calPrev()">‹</button>
-                        <span>${year}年 ${month + 1}月</span>
-                        <button onclick="window.calNext()">›</button>
-                    </div>
-                    <table>
-                        <thead><tr>
-                            <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
-                        </tr></thead>
-                        <tbody><tr>
-                `;
-
-                // Fill in days from previous month (greyed out)
-                for (let i = 0; i < firstDay; i++) {
-                    const day = daysInPrevMonth - firstDay + i + 1;
-                    html += `<td class="other-month">${day}</td>`;
-                }
-
-                // Fill in current month days
-                for (let d = 1; d <= daysInMonth; d++) {
-                    // Check if this day is today
-                    const isToday = (d === todayDate && month === todayMonth && year === todayYear);
-                    // Check if this day is selected
-                    const isSelected = selectedDate &&
-                                      d === selectedDate.getDate() &&
-                                      month === selectedDate.getMonth() &&
-                                      year === selectedDate.getFullYear();
-                    
-                    // Apply appropriate CSS classes
-                    const cls = (isToday ? 'today' : '') + (isSelected ? ' selected' : '');
-                    html += `<td class="${cls}" onclick="window.calSelect(${year}, ${month}, ${d})">${d}</td>`;
-                    
-                    // New row every 7 days
-                    if ((firstDay + d - 1) % 7 === 6 && d < daysInMonth) {
-                        html += `</tr><tr>`;
-                    }
-                }
-
-                // Fill in remaining cells with next month's days
-                const totalCells = firstDay + daysInMonth;
-                const remain = (7 - totalCells % 7) % 7;
-                for (let i = 1; i <= remain; i++) {
-                    html += `<td class="other-month">${i}</td>`;
-                }
-
-                html += `</tr></tbody></table>`;
-                calDiv.innerHTML = html;
-
-                // Update info text
-                if (selectedDate) {
-                    infoDiv.textContent = `Selected: ${selectedDate.getFullYear()}/${selectedDate.getMonth()+1}/${selectedDate.getDate()}`;
-                } else {
-                    infoDiv.textContent = 'Click a date to select';
-                }
-            }
-
-            /**
-             * Navigate to previous month
-             * Wraps to December of previous year if in January
-             */
-            window.calPrev = function() {
-                if (currentMonth === 0) {
-                    renderCalendar(currentYear - 1, 11);
-                } else {
-                    renderCalendar(currentYear, currentMonth - 1);
-                }
-            };
-
-            /**
-             * Navigate to next month
-             * Wraps to January of next year if in December
-             */
-            window.calNext = function() {
-                if (currentMonth === 11) {
-                    renderCalendar(currentYear + 1, 0);
-                } else {
-                    renderCalendar(currentYear, currentMonth + 1);
-                }
-            };
-
-            /**
-             * Select a date and re-render to show selection
-             * @param {number} year - Year of selected date
-             * @param {number} month - Month of selected date
-             * @param {number} day - Day of selected date
-             */
-            window.calSelect = function(year, month, day) {
-                selectedDate = new Date(year, month, day);
-                renderCalendar(currentYear, currentMonth);  // Re-render to update highlight
-            };
-
-            // Initialize calendar with current month
-            const now = new Date();
-            renderCalendar(now.getFullYear(), now.getMonth());
-        })();
-
-        /* ================================================
-           Photo Gallery Lightbox Functions
-           ================================================ */
-        
-        /**
-         * Display clicked image in fullscreen lightbox
-         * @param {string} src - Source URL of the image to display
-         */
-        function showBig(src) {
-            document.getElementById("bigImg").src = src;
-            document.getElementById("mask").style.display = "flex";
-        }
-
-        /**
-         * Close the lightbox modal
-         */
-        function closeBig() {
-            document.getElementById("mask").style.display = "none";
-        }
-
-        /* ================================================
-           Real-Time Clock
-           ================================================ */
-        
-        // Get clock element reference
-        const clock = document.getElementById("clock");
-
-        // Set initial time immediately
-        clock.innerText = new Date().toLocaleString('zh-CN', { hour12: false });
-
-        // Update clock every second
-        setInterval(() => {
-            clock.innerText = new Date().toLocaleString('zh-CN', { hour12: false });
-        }, 1000);
-    </script>
-
+// 4. 图片处理
+const fileInput=document.getElementById('fileInput');
+const preview=document.getElementById('previewImg');
+const hint=document.getElementById('hintText');
+const actionBar=document.getElementById('actionBar');
+window.handleImage=function(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    preview.src=ev.target.result;
+    preview.classList.add('show');
+    hint.style.display='none';
+    actionBar.classList.add('show');
+  };
+  reader.readAsDataURL(file);
+};
+window.setAsBackground=function(){
+  if(preview.src) {
+    document.body.style.backgroundImage=`url(${preview.src})`;
+    document.body.style.backgroundSize='cover';
+    document.body.style.backgroundPosition='center';
+  }
+};
+window.removeImage=function(){
+  preview.src='';
+  preview.classList.remove('show');
+  hint.style.display='block';
+  actionBar.classList.remove('show');
+  fileInput.value='';
+};
+</script>
 </body>
 </html>
