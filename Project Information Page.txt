@@ -1,5 +1,1 @@
-1.Draggable floating window: A floating window with a purple gradient title bar that can be dragged freely on the page.
-2.Interactive calendar: Support switching between months, highlighting the current date, and marking selected dates by clicking.
-3.Real-time clock: Displays the date and time in a 24-hour Chinese format and refreshes automatically every second.
-4.Photo album: Shows sea view photos in a three-column grid layout with zoom animation on mouse hover.
-5.Lightbox preview: Open full-size images with a black translucent mask after clicking thumbnails.
+Description: A pure front-end single-page tool that combines glassmorphism aesthetics with practical features. It provides a centrally placed web search box, a draggable control panel (with image upload/set-as-background and an interactive calendar), and a real-time digital clock. Zero dependencies, ready to use out of the box.
