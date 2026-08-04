@@ -1,1 +1,0 @@
-Description: A pure front-end single-page tool that combines glassmorphism aesthetics with practical features. It provides a centrally placed web search box, a draggable control panel (with image upload/set-as-background and an interactive calendar), and a real-time digital clock. Zero dependencies, ready to use out of the box.
