@@ -1,10 +1,5 @@
 Frost Kit
-3897654772: 08-05 10:59:45
-Glass Control Center
 A lightweight desktop toolkit with glassmorphism aesthetics, integrating search, image preview, calendar, and clock — zero dependencies, ready to use.
-
-3897654772: 08-05 11:01:18
-Frost Kit
 
 <!DOCTYPE html>
 <html lang="zh-CN">
