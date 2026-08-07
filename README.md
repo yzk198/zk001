@@ -279,10 +279,6 @@ body{min-height:100vh;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)
   update();
   setInterval(update, 1000);
 })();
-
-// ============================================
-// 图片拖拽上传
-// ============================================
 (function() {
   const dz = document.getElementById('dropZone');
   ['dragenter','dragover','dragleave','drop'].forEach(evt => {
@@ -330,50 +326,37 @@ body{min-height:100vh;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)
       return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     }
   }
-
   function updateDisplay() { display.textContent = format(seconds); }
-
   function start() { if (timer) return; timer = setInterval(() => { seconds++; updateDisplay(); }, 1000); }
   function stop() { clearInterval(timer); timer = null; }
   function reset() { stop(); seconds = 0; updateDisplay(); }
-
   document.getElementById('timerStart').addEventListener('click', start);
   document.getElementById('timerStop').addEventListener('click', stop);
   document.getElementById('timerReset').addEventListener('click', reset);
   updateDisplay();
 })();
-
-// ============================================
-// 骰子游戏
-// ============================================
 (function() {
   const valueEl = document.getElementById('diceValue');
   const historyEl = document.getElementById('diceHistory');
   const btn = document.getElementById('diceBtn');
   let history = [];
-
   // 骰子字符映射
   const diceFaces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-
   function roll() {
     // 动画
     valueEl.classList.remove('roll');
     void valueEl.offsetWidth; // 触发重绘
     valueEl.classList.add('roll');
-
     const result = Math.floor(Math.random() * 6) + 1;
     valueEl.textContent = diceFaces[result - 1];
-
     // 更新历史（保留最近5次）
     history.push(result);
     if (history.length > 5) history.shift();
     renderHistory();
   }
-
   function renderHistory() {
     historyEl.innerHTML = history.map(num => `<span>${diceFaces[num-1]}</span>`).join('');
   }
-
   btn.addEventListener('click', roll);
   // 初始化显示
   valueEl.textContent = diceFaces[0];
