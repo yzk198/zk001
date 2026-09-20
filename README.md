@@ -1,34 +1,46 @@
-Frost Kit
-A lightweight desktop toolkit with glassmorphism aesthetics, integrating search, image preview, calendar, and clock — zero dependencies, ready to use.
+# Glassmorphism Toolbox
 
-📖 Introduction
+A lightweight, browser-based desktop-style tool dashboard with glassmorphism design. All tools run locally in your browser, no backend server required.
 
-Glass Control Center is a pure front-end, single-page desktop assistant tool that combines Glassmorphism aesthetics with practical features. It provides web search, quick image preview, an interactive calendar, and a real-time clock — all with zero dependencies, ready to use out of the box. Perfect as a browser start page or daily utility.
+## Introduction
 
----
+This project is a lightweight desktop-style tool panel running in the browser with glassmorphism design. All tools run locally in your browser without a backend. The main control panel stays visible, other tools are hidden by default and can be opened by clicking hyperlinks. All tool windows support free dragging.
 
-✨ Features
+## Features
 
-· 🔍 Central Search Box: Centered on the page, supports keyword input and one-click search via Baidu (customizable).
-· 🪟 Draggable Control Panel: Drag the title bar to reposition the window freely without interfering with background operations.
-· 📁 Drag-and-Drop Image Preview: Drag an image from your desktop into the dashed zone to instantly open it in a new window.
-· 📅 Interactive Calendar: Displays the current month, supports month switching, and highlights selected dates with today's date marked.
-· 🕒 Real-Time Clock: Fixed at the bottom-right corner, updates every second in 24-hour format.
-· 🎨 Glassmorphism Visual Style: Translucent backgrounds with blur effects create a modern, soft, and focused interface.
+### Main Control Center (Always Visible)
 
----
+- Image drag & drop viewer: Drop an image to open it in a new browser tab
+- Interactive calendar: Switch months, select and display the chosen date
+- Stopwatch: Start, pause and reset timer
 
-🚀 How to Use
+### Extra Tools (Opened by clicking hyperlinks)
 
-1. Run Directly: Download or clone the project and open index.html in your browser.
-2. Search: Type keywords in the central search box and press Enter or click the "Search" button.
-3. Drag Panel: Hold the left mouse button on the control center title bar and drag to reposition.
-4. Drag Image: Drag an image file from your desktop into the dashed zone to preview it in a new window.
-5. Calendar: Click a date to select it, and use the arrow buttons to switch months.
-6. Clock: Runs automatically — no action required.
+- 🎲 Dice Roller: Animated dice roll with roll history
+- 📋 Todo List: Add, complete and delete tasks; data saved locally
+- 📏 Unit Converter: Length & weight unit conversion, one-click swap conversion direction
+- 📝 Sticky Note: Auto-saved local text note
+- ⏱ Countdown Timer: Custom minutes & seconds, alert popup when finished
+- 🎵 Music Player: Load local audio files, playback control, progress bar and volume slider
+- 🔑 Password Generator: Custom password length, toggle character types, one-click copy password
 
----
+## Tech Stack
 
-🎯 Design Inspiration
+- HTML
+- CSS (Glassmorphism style with backdrop-filter blur)
+- Vanilla JavaScript
+- LocalStorage: Store todo items and note data
 
-Inspired by the Glassmorphism design trend, this project uses semi-transparent backgrounds combined with blur effects to create a layered, airy visual experience. It strikes a balance between aesthetics and utility, delivering a clean and immersive tool interface.
+## How to Use
+
+1. Copy all source code and save it as an `.html` file (e.g. `toolbox.html`)
+2. Open the file with any modern browser (Chrome, Edge, Firefox, Safari)
+3. Use image drag, calendar and stopwatch directly on main control center
+4. Click hyperlinks at the bottom of control center to open tool windows
+5. Drag window header to move floating windows; click `✕` or re-click hyperlink to close
+
+## Notes
+
+1. All data is stored in browser LocalStorage. Clearing browser cache will erase todos and notes.
+2. The music player only loads local audio files and will not upload data to any server.
+3. If popups are blocked by browser, please allow popup permission for this page.
