@@ -1,164 +1,1554 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>毛玻璃工具箱</title>
+<title>Glassmorphism Toolbox</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{min-height:100vh;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:20px}
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box
+}
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);
+    font-family:system-ui,sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px
+}
 
-/* 搜索 */
-.s{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:460px;max-width:90vw;z-index:1000;background:rgba(10,15,30,.45);backdrop-filter:blur(18px);border-radius:60px;border:1px solid rgba(255,255,255,.08);padding:6px 6px 6px 22px;display:flex;align-items:center}
-.s input{flex:1;padding:14px 0;border:none;background:0 0;color:#f0f4ff;font-size:1rem;outline:none}
-.s input::placeholder{color:rgba(200,215,255,.4)}
-.s button{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#c8d6f0;padding:8px 20px;border-radius:40px;cursor:pointer}
-.s button:hover{background:rgba(0,200,255,.15);border-color:rgba(0,200,255,.3)}
+/* Search Bar */
+.s{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:460px;
+    max-width:90vw;
+    z-index:1000;
+    background:rgba(10,15,30,.45);
+    backdrop-filter:blur(18px);
+    border-radius:60px;
+    border:1px solid rgba(255,255,255,.08);
+    padding:6px 6px 6px 22px;
+    display:flex;
+    align-items:center
+}
+.s input{
+    flex:1;
+    padding:14px 0;
+    border:none;
+    background:0 0;
+    color:#f0f4ff;
+    font-size:1rem;
+    outline:none
+}
+.s input::placeholder{
+    color:rgba(200,215,255,.4)
+}
+.s button{
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    color:#c8d6f0;
+    padding:8px 20px;
+    border-radius:40px;
+    cursor:pointer
+}
+.s button:hover{
+    background:rgba(0,200,255,.15);
+    border-color:rgba(0,200,255,.3)
+}
 
-/* 主窗口 */
-#w{position:fixed;width:520px;background:rgba(10,15,30,.55);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(255,255,255,.08);top:60px;left:60px;overflow:hidden;z-index:999;user-select:none;max-height:90vh;display:flex;flex-direction:column}
-#b{height:46px;background:rgba(255,255,255,.04);color:#d0e0ff;line-height:46px;padding:0 20px;cursor:grab;display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
-#b:active{cursor:grabbing}
-#c{flex:1;overflow-y:auto;padding:16px 18px 20px;display:flex;gap:20px}
-.l{flex:2}.r{flex:1;border-left:1px solid rgba(255,255,255,.05);padding-left:18px;display:flex;flex-direction:column;justify-content:center}
+/* Common Window Style */
+.win{
+    position:fixed;
+    background:rgba(10,15,30,.55);
+    backdrop-filter:blur(16px);
+    border-radius:24px;
+    border:1px solid rgba(255,255,255,.08);
+    overflow:hidden;
+    z-index:998;
+    user-select:none;
+    box-shadow:0 20px 60px rgba(0,0,0,.6);
+    display:flex;
+    flex-direction:column
+}
+.win-head{
+    height:40px;
+    background:rgba(255,255,255,.04);
+    color:#d0e0ff;
+    line-height:40px;
+    padding:0 16px;
+    cursor:grab;
+    display:flex;
+    justify-content:space-between;
+    border-bottom:1px solid rgba(255,255,255,.05);
+    font-size:.9rem;
+    flex-shrink:0
+}
+.win-head:active{
+    cursor:grabbing
+}
+.win-body{
+    padding:16px;
+    color:#c8d6f0;
+    flex:1;
+    overflow-y:auto
+}
+.win-btn{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    color:#c8d6f0;
+    padding:6px 14px;
+    border-radius:20px;
+    cursor:pointer;
+    font-size:.8rem;
+    transition:.15s
+}
+.win-btn:hover{
+    background:rgba(0,200,255,.15);
+    border-color:rgba(0,200,255,.3)
+}
+.win-input,
+.win-select{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    color:#c8d6f0;
+    padding:6px 10px;
+    border-radius:20px;
+    font-size:.85rem;
+    outline:none;
+    width:100%
+}
+.win-input:focus,
+.win-select:focus{
+    border-color:rgba(0,200,255,.3)
+}
 
-/* 图片拖拽 */
-.u{display:block;width:100%;padding:16px 12px;margin-bottom:16px;text-align:center;background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.15);border-radius:16px;color:rgba(200,215,255,.5);font-size:.85rem;transition:.3s}
-.u.drag{border-color:rgba(0,200,255,.6);background:rgba(0,200,255,.08);color:#c8d6f0}
-.u span{display:block;font-size:1.8rem;margin-bottom:4px}
+/* Hidden by default */
+.hidden{
+    display:none !important
+}
 
-/* 日历 */
-#cal{width:100%;max-width:280px;margin:0 auto;text-align:center}
-#cal .hd{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:1rem;color:#b6ceff;margin-bottom:12px}
-#cal .hd button{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);width:32px;height:32px;border-radius:30px;font-size:1.2rem;color:#a0c0ff;cursor:pointer}
-#cal .hd button:hover{background:rgba(0,255,255,.12)}
-#cal table{width:100%;border-collapse:collapse;table-layout:fixed}
-#cal th{font-size:.65rem;color:rgba(180,200,255,.4);padding:6px 0;font-weight:400}
-#cal td{padding:7px 0;font-size:.9rem;text-align:center;cursor:pointer;border-radius:30px;color:#c8d6f0}
-#cal td:hover:not(.o){background:rgba(255,255,255,.06)}
-#cal td.t{background:rgba(0,200,255,.15);color:#fff;font-weight:600}
-#cal td.s{background:linear-gradient(135deg,#00d4ff,#a855f7);color:#fff;font-weight:600}
-#cal td.o{color:rgba(255,255,255,.12);pointer-events:none}
-#cal .inf{text-align:center;margin-top:14px;font-size:.75rem;color:rgba(180,200,255,.35);border-top:1px solid rgba(255,255,255,.04);padding-top:12px}
+/* Main Control Center Window */
+#w{
+    width:520px;
+    top:60px;
+    left:60px;
+    max-height:90vh
+}
+#b{
+    height:46px;
+    background:rgba(255,255,255,.04);
+    color:#d0e0ff;
+    line-height:46px;
+    padding:0 20px;
+    cursor:grab;
+    display:flex;
+    justify-content:space-between;
+    border-bottom:1px solid rgba(255,255,255,.05);
+    flex-shrink:0
+}
+#b:active{
+    cursor:grabbing
+}
+#c{
+    flex:1;
+    overflow-y:auto;
+    padding:16px 18px 20px;
+    display:flex;
+    gap:20px
+}
+.l{
+    flex:2
+}
+.r{
+    flex:1;
+    border-left:1px solid rgba(255,255,255,.05);
+    padding-left:18px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center
+}
 
-/* 计时器 */
-.tm{display:flex;flex-direction:column;align-items:center;gap:12px}
-.tm .dp{font-size:2.2rem;font-family:monospace;color:#f0f4ff;letter-spacing:3px;background:rgba(0,0,0,.2);padding:10px 16px;border-radius:16px;border:1px solid rgba(255,255,255,.05);width:100%;text-align:center}
-.tm .bg{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.tm .bg button{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:#c8d6f0;padding:6px 16px;border-radius:30px;cursor:pointer;font-size:.85rem;transition:.15s}
-.tm .bg button:hover{background:rgba(255,255,255,.12)}
-.tm .bg .st{background:rgba(0,200,255,.15);border-color:rgba(0,200,255,.2)}
-.tm .bg .st:hover{background:rgba(0,200,255,.25)}
-.tm .bg .sp{background:rgba(255,100,100,.15);border-color:rgba(255,100,100,.2)}
-.tm .bg .sp:hover{background:rgba(255,100,100,.25)}
-.tm .bg .rs{background:rgba(255,200,50,.1);border-color:rgba(255,200,50,.15)}
-.tm .bg .rs:hover{background:rgba(255,200,50,.2)}
+/* Tool Links Area */
+.tool-links{
+    margin-top:16px;
+    padding-top:16px;
+    border-top:1px solid rgba(255,255,255,.05);
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 12px
+}
+.tool-links a{
+    color:#a0c0ff;
+    text-decoration:none;
+    font-size:.8rem;
+    padding:4px 10px;
+    border-radius:12px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.06);
+    transition:.15s
+}
+.tool-links a:hover{
+    color:#00e5ff;
+    background:rgba(0,200,255,.1);
+    border-color:rgba(0,200,255,.25)
+}
 
-/* 时钟 */
-#cl{position:fixed;bottom:28px;right:28px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);color:#9effb0;padding:8px 20px;border-radius:40px;font:16px monospace;border:1px solid rgba(0,255,200,.08);z-index:999}
+/* Image Drag Area */
+.u{
+    display:block;
+    width:100%;
+    padding:16px 12px;
+    margin-bottom:16px;
+    text-align:center;
+    background:rgba(255,255,255,.04);
+    border:2px dashed rgba(255,255,255,.15);
+    border-radius:16px;
+    color:rgba(200,215,255,.5);
+    font-size:.85rem;
+    transition:.3s
+}
+.u.drag{
+    border-color:rgba(0,200,255,.6);
+    background:rgba(0,200,255,.08);
+    color:#c8d6f0
+}
+.u span{
+    display:block;
+    font-size:1.8rem;
+    margin-bottom:4px
+}
 
-/* 骰子窗口（右下） */
-#dw{position:fixed;width:240px;background:rgba(10,15,30,.55);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(255,255,255,.08);bottom:100px;right:60px;overflow:hidden;z-index:998;user-select:none;box-shadow:0 20px 60px rgba(0,0,0,.6)}
-#db{height:40px;background:rgba(255,255,255,.04);color:#d0e0ff;line-height:40px;padding:0 16px;cursor:grab;display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.05);font-size:.9rem}
-#db:active{cursor:grabbing}
-#dc{padding:16px;text-align:center;color:#c8d6f0}
-#dv{font-size:4rem;font-weight:300;margin:8px 0;transition:.1s}
-#dv.roll{animation:sh .3s ease-in-out}
-@keyframes sh{0%{transform:scale(1) rotate(0deg)}25%{transform:scale(1.2) rotate(-10deg)}50%{transform:scale(1) rotate(10deg)}75%{transform:scale(1.1) rotate(-5deg)}100%{transform:scale(1) rotate(0deg)}}
-#dbn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#c8d6f0;padding:8px 20px;border-radius:30px;cursor:pointer;font-size:1rem;transition:.15s}
-#dbn:hover{background:rgba(0,200,255,.15);border-color:rgba(0,200,255,.3)}
-#dh{margin-top:12px;font-size:.8rem;color:rgba(200,215,255,.5);display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
-#dh span{background:rgba(255,255,255,.05);padding:2px 8px;border-radius:12px}
+/* Calendar */
+#cal{
+    width:100%;
+    max-width:280px;
+    margin:0 auto;
+    text-align:center
+}
+#cal .hd{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-weight:600;
+    font-size:1rem;
+    color:#b6ceff;
+    margin-bottom:12px
+}
+#cal .hd button{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    width:32px;
+    height:32px;
+    border-radius:30px;
+    font-size:1.2rem;
+    color:#a0c0ff;
+    cursor:pointer
+}
+#cal .hd button:hover{
+    background:rgba(0,255,255,.12)
+}
+#cal table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed
+}
+#cal th{
+    font-size:.65rem;
+    color:rgba(180,200,255,.4);
+    padding:6px 0;
+    font-weight:400
+}
+#cal td{
+    padding:7px 0;
+    font-size:.9rem;
+    text-align:center;
+    cursor:pointer;
+    border-radius:30px;
+    color:#c8d6f0
+}
+#cal td:hover:not(.o){
+    background:rgba(255,255,255,.06)
+}
+#cal td.t{
+    background:rgba(0,200,255,.15);
+    color:#fff;
+    font-weight:600
+}
+#cal td.s{
+    background:linear-gradient(135deg,#00d4ff,#a855f7);
+    color:#fff;
+    font-weight:600
+}
+#cal td.o{
+    color:rgba(255,255,255,.12);
+    pointer-events:none
+}
+#cal .inf{
+    text-align:center;
+    margin-top:14px;
+    font-size:.75rem;
+    color:rgba(180,200,255,.35);
+    border-top:1px solid rgba(255,255,255,.04);
+    padding-top:12px
+}
 
-/* 待办窗口（骰子左侧） */
-#tw{position:fixed;width:280px;background:rgba(10,15,30,.55);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(255,255,255,.08);bottom:100px;right:320px; /* 骰子宽240 + 右边距60 + 间距20 */ overflow:hidden;z-index:998;user-select:none;box-shadow:0 20px 60px rgba(0,0,0,.6);max-height:320px;display:flex;flex-direction:column}
-#tb{height:40px;background:rgba(255,255,255,.04);color:#d0e0ff;line-height:40px;padding:0 16px;cursor:grab;display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.05);font-size:.9rem;flex-shrink:0}
-#tb:active{cursor:grabbing}
-#tc{padding:12px 16px 16px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
-#tiw{display:flex;gap:6px}
-#tiw input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:#c8d6f0;padding:6px 10px;border-radius:20px;font-size:.85rem;outline:none}
-#tiw input:focus{border-color:rgba(0,200,255,.3)}
-#tiw button{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:#c8d6f0;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.8rem;transition:.15s}
-#tiw button:hover{background:rgba(0,200,255,.15);border-color:rgba(0,200,255,.3)}
-#tl{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px}
-#tl li{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.04);padding:4px 10px;border-radius:16px;color:#c8d6f0;font-size:.85rem;transition:.15s}
-#tl li:hover{background:rgba(255,255,255,.08)}
-#tl li .tx{flex:1;cursor:pointer;padding:4px 0;transition:.15s}
-#tl li .tx.done{text-decoration:line-through;opacity:.5}
-#tl li .dl{background:rgba(255,100,100,.1);border:none;color:#ff6b6b;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center}
-#tl li .dl:hover{background:rgba(255,100,100,.25)}
+/* Timer */
+.tm{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px
+}
+.tm .dp{
+    font-size:2.2rem;
+    font-family:monospace;
+    color:#f0f4ff;
+    letter-spacing:3px;
+    background:rgba(0,0,0,.2);
+    padding:10px 16px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.05);
+    width:100%;
+    text-align:center
+}
+.tm .bg{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:center
+}
+.tm .bg button{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    color:#c8d6f0;
+    padding:6px 16px;
+    border-radius:30px;
+    cursor:pointer;
+    font-size:.85rem;
+    transition:.15s
+}
+.tm .bg button:hover{
+    background:rgba(255,255,255,.12)
+}
+.tm .bg .st{
+    background:rgba(0,200,255,.15);
+    border-color:rgba(0,200,255,.2)
+}
+.tm .bg .st:hover{
+    background:rgba(0,200,255,.25)
+}
+.tm .bg .sp{
+    background:rgba(255,100,100,.15);
+    border-color:rgba(255,100,100,.2)
+}
+.tm .bg .sp:hover{
+    background:rgba(255,100,100,.25)
+}
+.tm .bg .rs{
+    background:rgba(255,200,50,.1);
+    border-color:rgba(255,200,50,.15)
+}
+.tm .bg .rs:hover{
+    background:rgba(255,200,50,.2)
+}
+
+/* Clock */
+#cl{
+    position:fixed;
+    bottom:28px;
+    right:28px;
+    background:rgba(0,0,0,.5);
+    backdrop-filter:blur(8px);
+    color:#9effb0;
+    padding:8px 20px;
+    border-radius:40px;
+    font:16px monospace;
+    border:1px solid rgba(0,255,200,.08);
+    z-index:999
+}
+
+/* Dice Window */
+#dw{
+    width:240px;
+    bottom:100px;
+    right:60px
+}
+#dc{
+    padding:16px;
+    text-align:center;
+    color:#c8d6f0
+}
+#dv{
+    font-size:4rem;
+    font-weight:300;
+    margin:8px 0;
+    transition:.1s
+}
+#dv.roll{
+    animation:sh .3s ease-in-out
+}
+@keyframes sh{
+    0%{transform:scale(1) rotate(0deg)}
+    25%{transform:scale(1.2) rotate(-10deg)}
+    50%{transform:scale(1) rotate(10deg)}
+    75%{transform:scale(1.1) rotate(-5deg)}
+    100%{transform:scale(1) rotate(0deg)}
+}
+#dbn{
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    color:#c8d6f0;
+    padding:8px 20px;
+    border-radius:30px;
+    cursor:pointer;
+    font-size:1rem;
+    transition:.15s
+}
+#dbn:hover{
+    background:rgba(0,200,255,.15);
+    border-color:rgba(0,200,255,.3)
+}
+#dh{
+    margin-top:12px;
+    font-size:.8rem;
+    color:rgba(200,215,255,.5);
+    display:flex;
+    gap:6px;
+    justify-content:center;
+    flex-wrap:wrap
+}
+#dh span{
+    background:rgba(255,255,255,.05);
+    padding:2px 8px;
+    border-radius:12px
+}
+
+/* Todo Window */
+#tw{
+    width:280px;
+    bottom:100px;
+    right:320px;
+    max-height:320px
+}
+#tiw{
+    display:flex;
+    gap:6px
+}
+#tl{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:4px
+}
+#tl li{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(255,255,255,.04);
+    padding:4px 10px;
+    border-radius:16px;
+    color:#c8d6f0;
+    font-size:.85rem;
+    transition:.15s
+}
+#tl li:hover{
+    background:rgba(255,255,255,.08)
+}
+#tl li .tx{
+    flex:1;
+    cursor:pointer;
+    padding:4px 0;
+    transition:.15s
+}
+#tl li .tx.done{
+    text-decoration:line-through;
+    opacity:.5
+}
+#tl li .dl{
+    background:rgba(255,100,100,.1);
+    border:none;
+    color:#ff6b6b;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:.8rem;
+    display:flex;
+    align-items:center;
+    justify-content:center
+}
+#tl li .dl:hover{
+    background:rgba(255,100,100,.25)
+}
+
+/* Unit Converter */
+#unitWin{
+    width:280px;
+    top:60px;
+    right:60px
+}
+.unit-row{
+    display:flex;
+    gap:8px;
+    margin:8px 0;
+    align-items:center
+}
+.unit-row input{
+    flex:1
+}
+.unit-row select{
+    width:90px
+}
+.unit-swap{
+    text-align:center;
+    margin:4px 0;
+    cursor:pointer;
+    opacity:.6;
+    transition:.2s
+}
+.unit-swap:hover{
+    opacity:1;
+    color:#00e5ff
+}
+
+/* Sticky Notes */
+#noteWin{
+    width:260px;
+    top:340px;
+    right:60px;
+    max-height:360px
+}
+#noteText{
+    width:100%;
+    height:180px;
+    resize:none;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    padding:10px;
+    color:#c8d6f0;
+    outline:none;
+    font-family:inherit;
+    font-size:.85rem
+}
+.note-status{
+    font-size:.75rem;
+    opacity:.5;
+    margin-top:8px;
+    text-align:right
+}
+
+/* Countdown Timer */
+#countdownWin{
+    width:260px;
+    top:60px;
+    right:360px
+}
+.cd-display{
+    font-size:2.4rem;
+    font-family:monospace;
+    text-align:center;
+    margin:10px 0;
+    color:#f0f4ff;
+    letter-spacing:2px;
+    background:rgba(0,0,0,.2);
+    padding:12px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.05)
+}
+.cd-set{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin-bottom:10px
+}
+.cd-set input{
+    width:60px;
+    text-align:center
+}
+.cd-btns{
+    display:flex;
+    gap:8px;
+    justify-content:center
+}
+
+/* Music Player */
+#musicWin{
+    width:300px;
+    top:60px;
+    right:660px
+}
+.music-file{
+    width:100%;
+    margin-bottom:12px;
+    font-size:.8rem;
+    color:#c8d6f0
+}
+.music-name{
+    font-size:.85rem;
+    margin-bottom:10px;
+    text-align:center;
+    opacity:.8;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap
+}
+.music-progress{
+    width:100%;
+    height:6px;
+    background:rgba(255,255,255,.1);
+    border-radius:3px;
+    cursor:pointer;
+    margin-bottom:8px;
+    overflow:hidden
+}
+.music-progress-bar{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#00d4ff,#a855f7);
+    border-radius:3px;
+    transition:width .1s linear
+}
+.music-time{
+    display:flex;
+    justify-content:space-between;
+    font-size:.7rem;
+    opacity:.6;
+    margin-bottom:10px
+}
+.music-controls{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin-bottom:10px
+}
+.music-controls button{
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.06);
+    color:#c8d6f0;
+    cursor:pointer;
+    font-size:1rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.15s
+}
+.music-controls button:hover{
+    background:rgba(0,200,255,.15);
+    border-color:rgba(0,200,255,.3)
+}
+.music-volume{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:.75rem
+}
+.music-volume input{
+    flex:1;
+    accent-color:#00d4ff
+}
+
+/* Password Generator */
+#passWin{
+    width:280px;
+    top:340px;
+    right:360px
+}
+.pass-output{
+    width:100%;
+    background:rgba(0,0,0,.2);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    padding:10px 14px;
+    font-family:monospace;
+    font-size:1rem;
+    color:#00e5ff;
+    margin-bottom:12px;
+    word-break:break-all;
+    min-height:40px;
+    display:flex;
+    align-items:center
+}
+.pass-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:6px 0;
+    font-size:.85rem
+}
+.pass-row input[type="number"]{
+    width:60px;
+    text-align:center
+}
+.pass-btns{
+    display:flex;
+    gap:8px;
+    margin-top:12px
+}
+.pass-btns button{
+    flex:1
+}
 </style>
 </head>
 <body>
+<!-- Search Bar -->
 <form class="s" action="https://www.baidu.com/s" target="_blank" method="get">
-  <input type="text" name="wd" placeholder="🔍 搜索...">
-  <button>搜索</button>
+  <input type="text" name="wd" placeholder="🔍 Search...">
+  <button>Search</button>
 </form>
 
-<div id="w">
-  <div id="b" onmousedown="dragStart(event,'w')"><span>✧ 工具箱</span><span>🪟</span></div>
+<!-- Main Control Center -->
+<div id="w" class="win">
+  <div id="b" onmousedown="dragStart(event,'w')">
+    <span>✧ Control Center</span>
+    <span>🪟</span>
+  </div>
   <div id="c">
     <div class="l">
-      <div class="u" id="uz"><span>📁</span>拖拽图片<br><span style="font-size:.7rem;opacity:.6">新窗口打开</span></div>
+      <div class="u" id="uz">
+        <span>📁</span>
+        Drag Image Here
+        <br>
+        <span style="font-size:.7rem;opacity:.6">Open in new window</span>
+      </div>
       <div id="cal"></div>
+      
+      <!-- Tool Links (Click to open window) -->
+      <div class="tool-links">
+        <a href="javascript:void(0)" onclick="toggleWin('dw')">🎲 Dice</a>
+        <a href="javascript:void(0)" onclick="toggleWin('tw')">📋 Todo List</a>
+        <a href="javascript:void(0)" onclick="toggleWin('unitWin')">📏 Unit Converter</a>
+        <a href="javascript:void(0)" onclick="toggleWin('noteWin')">📝 Sticky Note</a>
+        <a href="javascript:void(0)" onclick="toggleWin('countdownWin')">⏱ Countdown</a>
+        <a href="javascript:void(0)" onclick="toggleWin('musicWin')">🎵 Music Player</a>
+        <a href="javascript:void(0)" onclick="toggleWin('passWin')">🔑 Password Gen</a>
+      </div>
     </div>
     <div class="r">
       <div class="tm">
         <div class="dp" id="tdp">00:00</div>
         <div class="bg">
-          <button class="st" id="tst">▶ 开始</button>
-          <button class="sp" id="tsp">⏸ 暂停</button>
-          <button class="rs" id="trs">⟳ 重置</button>
+          <button class="st" id="tst">▶ Start</button>
+          <button class="sp" id="tsp">⏸ Pause</button>
+          <button class="rs" id="trs">⟳ Reset</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<div id="dw">
-  <div id="db" onmousedown="dragStart(event,'dw')"><span>🎲 骰子</span><span style="opacity:.5;">🎯</span></div>
+<!-- 1. Dice Window (Hidden by default) -->
+<div id="dw" class="win hidden">
+  <div id="db" class="win-head" onmousedown="dragStart(event,'dw')">
+    <span>🎲 Dice</span>
+    <span style="opacity:.5;cursor:pointer" onclick="toggleWin('dw')">✕</span>
+  </div>
   <div id="dc">
     <div id="dv">⚀</div>
-    <button id="dbn">掷骰子</button>
+    <button id="dbn">Roll</button>
     <div id="dh"></div>
   </div>
 </div>
 
-<div id="tw">
-  <div id="tb" onmousedown="dragStart(event,'tw')"><span>📋 待办</span><span style="opacity:.5;">✓</span></div>
-  <div id="tc">
+<!-- 2. Todo Window (Hidden by default) -->
+<div id="tw" class="win hidden">
+  <div id="tb" class="win-head" onmousedown="dragStart(event,'tw')">
+    <span>📋 Todo List</span>
+    <span style="opacity:.5;cursor:pointer" onclick="toggleWin('tw')">✕</span>
+  </div>
+  <div id="tc" class="win-body">
     <div id="tiw">
-      <input type="text" id="tinput" placeholder="添加任务...">
-      <button id="tadd">添加</button>
+      <input class="win-input" type="text" id="tinput" placeholder="Add a task...">
+      <button class="win-btn" id="tadd">Add</button>
     </div>
     <ul id="tl"></ul>
+  </div>
+</div>
+
+<!-- 3. Unit Converter (Hidden by default) -->
+<div id="unitWin" class="win hidden">
+  <div class="win-head" onmousedown="dragStart(event,'unitWin')">
+    <span>📏 Unit Converter</span>
+    <span style="opacity:.5;cursor:pointer" onclick="toggleWin('unitWin')">✕</span>
+  </div>
+  <div class="win-body">
+    <select class="win-select" id="unitType" onchange="updateUnitOptions()">
+      <option value="length">Length</option>
+      <option value="weight">Weight</option>
+    </select>
+    
+    <div class="unit-row">
+      <input class="win-input" id="unitVal1" type="number" value="1" oninput="convertUnit(1)">
+      <select class="win-select" id="unitSel1" onchange="convertUnit(1)"></select>
+    </div>
+    
+    <div class="unit-swap" onclick="swapUnits()">⇅ Swap</div>
+    
+    <div class="unit-row">
+      <input class="win-input" id="unitVal2" type="number" oninput="convertUnit(2)">
+      <select class="win-select" id="unitSel2" onchange="convertUnit(2)"></select>
+    </div>
+  </div>
+</div>
+
+<!-- 4. Sticky Notes (Hidden by default) -->
+<div id="noteWin" class="win hidden">
+  <div class="win-head" onmousedown="dragStart(event,'noteWin')">
+    <span>📝 Sticky Note</span>
+    <span style="opacity:.5;cursor:pointer" onclick="toggleWin('noteWin')">✕</span>
+  </div>
+  <div class="win-body">
+    <textarea id="noteText" placeholder="Write something..."></textarea>
+    <div class="note-status" id="noteStatus">Auto-saved</div>
+  </div>
+</div>
+
+<!-- 5. Countdown Timer (Hidden by default) -->
+<div id="countdownWin" class="win hidden">
+  <div class="win-head" onmousedown="dragStart(event,'countdownWin')">
+    <span>⏱ Countdown</span>
+    <span style="opacity:.5;cursor:pointer" onclick="toggleWin('countdownWin')">✕</span>
+  </div>
+  <div class="win-body">
+    <div class="cd-set">
+      <input class="win-input" id="cdMin" type="number" min="0" max="99" value="5">
+      <span style="line-height:32px;">min</span>
+      <input class="win-input" id="cdSec" type="number" min="0" max="59" value="0">
+      <span style="line-height:32px;">sec</span>
+    </div>
+    <div class="cd-display" id="cdDisplay">05:00</div>
+    <div class="cd-btns">
+      <button class="win-btn" id="cdStart">Start</button>
+      <button class="win-btn" id="cdPause">Pause</button>
+      <button class="win-btn" id="cdReset">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- 6. Music Player (Hidden by default) -->
+<div id="musicWin" class="win hidden">
+  <div class="win-head" onmousedown="dragStart(event,'musicWin')">
+    <span>🎵 Music Player</span>
+    <span style="opacity:.5;cursor:pointer" onclick="toggleWin('musicWin')">✕</span>
+  </div>
+  <div class="win-body">
+    <input class="music-file" type="file" id="musicFile" accept="audio/*">
+    <div class="music-name" id="musicName">No file selected</div>
+    
+    <div class="music-progress" id="musicProgress">
+      <div class="music-progress-bar" id="musicProgressBar"></div>
+    </div>
+    
+    <div class="music-time">
+      <span id="musicCurrent">00:00</span>
+      <span id="musicTotal">00:00</span>
+    </div>
+    
+    <div class="music-controls">
+      <button id="musicPlay">▶</button>
+      <button id="musicPause">⏸</button>
+    </div>
+    
+    <div class="music-volume">
+      <span>🔊</span>
+      <input type="range" id="musicVolume" min="0" max="100" value="80">
+    </div>
+  </div>
+</div>
+
+<!-- 7. Password Generator (Hidden by default) -->
+<div id="passWin" class="win hidden">
+  <div class="win-head" onmousedown="dragStart(event,'passWin')">
+    <span>🔑 Password Generator</span>
+    <span style="opacity:.5;cursor:pointer" onclick="toggleWin('passWin')">✕</span>
+  </div>
+  <div class="win-body">
+    <div class="pass-output" id="passOutput">Click generate</div>
+    
+    <div class="pass-row">
+      <span>Length</span>
+      <input class="win-input" type="number" id="passLength" min="4" max="64" value="16">
+    </div>
+    
+    <div class="pass-row">
+      <label><input type="checkbox" id="passUpper" checked> Uppercase</label>
+    </div>
+    <div class="pass-row">
+      <label><input type="checkbox" id="passLower" checked> Lowercase</label>
+    </div>
+    <div class="pass-row">
+      <label><input type="checkbox" id="passNumber" checked> Numbers</label>
+    </div>
+    <div class="pass-row">
+      <label><input type="checkbox" id="passSymbol"> Symbols</label>
+    </div>
+    
+    <div class="pass-btns">
+      <button class="win-btn" id="passGenerate">Generate</button>
+      <button class="win-btn" id="passCopy">Copy</button>
+    </div>
   </div>
 </div>
 
 <div id="cl"></div>
 
 <script>
-// 通用拖拽
-(function(){let w=null,ox,oy;window.dragStart=function(e,id){e.preventDefault();w=document.getElementById(id);ox=e.clientX-w.offsetLeft;oy=e.clientY-w.offsetTop;document.onmousemove=ev=>{ev.preventDefault();w.style.left=(ev.clientX-ox)+'px';w.style.top=(ev.clientY-oy)+'px'};document.onmouseup=()=>{document.onmousemove=null;document.onmouseup=null;w=null}}})();
+// Toggle window show/hide
+function toggleWin(id){
+    document.getElementById(id).classList.toggle('hidden');
+}
 
-// 日历
-(function(){const c=document.getElementById('cal');let y,m,sel=null;function R(yy,mm){y=yy;m=mm;const fd=new Date(yy,mm,1).getDay(),dm=new Date(yy,mm+1,0).getDate(),pm=new Date(yy,mm,0).getDate();const t=new Date(),td=t.getDate(),tm=t.getMonth(),ty=t.getFullYear();let h=`<div class="hd"><button onclick="P()">‹</button><span>${yy}年 ${mm+1}月</span><button onclick="N()">›</button></div><table><thead><tr><th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th></tr></thead><tbody><tr>`;for(let i=0;i<fd;i++){const d=pm-fd+i+1;h+=`<td class="o">${d}</td>`;}for(let d=1;d<=dm;d++){const isT=d===td&&mm===tm&&yy===ty;const isS=sel&&d===sel.getDate()&&mm===sel.getMonth()&&yy===sel.getFullYear();const cl=(isT?' t':'')+(isS?' s':'');h+=`<td class="${cl}" onclick="Q(${yy},${mm},${d})">${d}</td>`;if((fd+d-1)%7===6&&d<dm)h+='</tr><tr>';}const rem=(7-(fd+dm)%7)%7;for(let i=1;i<=rem;i++)h+=`<td class="o">${i}</td>`;h+=`</tr></tbody></table><div class="inf">${sel?'已选：'+sel.getFullYear()+'/'+(sel.getMonth()+1)+'/'+sel.getDate():'点击日期选中'}</div>`;c.innerHTML=h;}window.P=()=>{if(m===0)R(y-1,11);else R(y,m-1);};window.N=()=>{if(m===11)R(y+1,0);else R(y,m+1);};window.Q=(yy,mm,dd)=>{sel=new Date(yy,mm,dd);R(y,m);};const n=new Date();R(n.getFullYear(),n.getMonth());})();
+// Common drag function
+(function(){
+    let w = null;
+    let ox, oy;
+    
+    window.dragStart = function(e, id){
+        e.preventDefault();
+        w = document.getElementById(id);
+        ox = e.clientX - w.offsetLeft;
+        oy = e.clientY - w.offsetTop;
+        
+        document.onmousemove = function(ev){
+            ev.preventDefault();
+            w.style.left = (ev.clientX - ox) + 'px';
+            w.style.top = (ev.clientY - oy) + 'px';
+        };
+        
+        document.onmouseup = function(){
+            document.onmousemove = null;
+            document.onmouseup = null;
+            w = null;
+        };
+    };
+})();
 
-// 时钟
-setInterval(()=>{document.getElementById('cl').textContent=new Date().toLocaleString('zh-CN',{hour12:false})},1000);
-document.getElementById('cl').textContent=new Date().toLocaleString('zh-CN',{hour12:false});
+// Calendar
+(function(){
+    const c = document.getElementById('cal');
+    let y, m, sel = null;
+    
+    function R(yy, mm){
+        y = yy;
+        m = mm;
+        
+        const firstDay = new Date(yy, mm, 1).getDay();
+        const daysInMonth = new Date(yy, mm + 1, 0).getDate();
+        const daysInPrevMonth = new Date(yy, mm, 0).getDate();
+        
+        const today = new Date();
+        const td = today.getDate();
+        const tm = today.getMonth();
+        const ty = today.getFullYear();
+        
+        let h = `
+            <div class="hd">
+                <button onclick="P()">‹</button>
+                <span>${yy} ${new Date(yy, mm).toLocaleString('en-US', {month:'long'})}</span>
+                <button onclick="N()">›</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sun</th>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+        `;
+        
+        // Previous month days
+        for(let i = 0; i < firstDay; i++){
+            const d = daysInPrevMonth - firstDay + i + 1;
+            h += `<td class="o">${d}</td>`;
+        }
+        
+        // Current month days
+        for(let d = 1; d <= daysInMonth; d++){
+            const isToday = d === td && mm === tm && yy === ty;
+            const isSelected = sel && 
+                d === sel.getDate() && 
+                mm === sel.getMonth() && 
+                yy === sel.getFullYear();
+            
+            const cl = (isToday ? ' t' : '') + (isSelected ? ' s' : '');
+            h += `<td class="${cl}" onclick="Q(${yy},${mm},${d})">${d}</td>`;
+            
+            if((firstDay + d - 1) % 7 === 6 && d < daysInMonth){
+                h += '</tr><tr>';
+            }
+        }
+        
+        // Next month days
+        const remaining = (7 - (firstDay + daysInMonth) % 7) % 7;
+        for(let i = 1; i <= remaining; i++){
+            h += `<td class="o">${i}</td>`;
+        }
+        
+        const infoText = sel 
+            ? 'Selected: ' + sel.toLocaleDateString('en-US') 
+            : 'Click date to select';
+        
+        h += `
+                    </tr>
+                </tbody>
+            </table>
+            <div class="inf">${infoText}</div>
+        `;
+        
+        c.innerHTML = h;
+    }
+    
+    window.P = function(){
+        if(m === 0) R(y - 1, 11);
+        else R(y, m - 1);
+    };
+    
+    window.N = function(){
+        if(m === 11) R(y + 1, 0);
+        else R(y, m + 1);
+    };
+    
+    window.Q = function(yy, mm, dd){
+        sel = new Date(yy, mm, dd);
+        R(y, m);
+    };
+    
+    const now = new Date();
+    R(now.getFullYear(), now.getMonth());
+})();
 
-// 图片拖拽
-(function(){const uz=document.getElementById('uz');['dragenter','dragover','dragleave','drop'].forEach(evt=>document.addEventListener(evt,e=>{e.preventDefault();e.stopPropagation()}));uz.addEventListener('dragover',()=>uz.classList.add('drag'));uz.addEventListener('dragleave',()=>uz.classList.remove('drag'));uz.addEventListener('drop',function(e){this.classList.remove('drag');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){const r=new FileReader();r.onload=ev=>{const w=window.open('','_blank','width=800,height=600,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes');if(!w){alert('请允许弹窗');return;}w.document.write(`<!DOCTYPE html><html><head><title>图片</title><style>*{margin:0;padding:0}body{background:#0a0a0f;display:flex;align-items:center;justify-content:center;min-height:100vh}img{max-width:95vw;max-height:95vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.8)}</style></head><body>< img src="${ev.target.result}"></body></html>`);w.document.close();};r.readAsDataURL(f);}else alert('请拖入图片文件');});})();
+// Clock
+setInterval(function(){
+    document.getElementById('cl').textContent = 
+        new Date().toLocaleString('en-US', {hour12: false});
+}, 1000);
 
-// 计时器
-(function(){const dp=document.getElementById('tdp');let timer=null,sec=0;const fmt=s=>{const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return h>0?`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;};const upd=()=>{dp.textContent=fmt(sec);};const st=()=>{if(timer)return;timer=setInterval(()=>{sec++;upd();},1000);};const sp=()=>{clearInterval(timer);timer=null;};const rs=()=>{sp();sec=0;upd();};document.getElementById('tst').onclick=st;document.getElementById('tsp').onclick=sp;document.getElementById('trs').onclick=rs;upd();})();
+document.getElementById('cl').textContent = 
+    new Date().toLocaleString('en-US', {hour12: false});
 
-// 骰子
-(function(){const dv=document.getElementById('dv'),dh=document.getElementById('dh'),btn=document.getElementById('dbn');const faces=['⚀','⚁','⚂','⚃','⚄','⚅'],h=[];const roll=()=>{dv.classList.remove('roll');void dv.offsetWidth;dv.classList.add('roll');const r=Math.floor(Math.random()*6)+1;dv.textContent=faces[r-1];h.push(r);if(h.length>5)h.shift();dh.innerHTML=h.map(n=>`<span>${faces[n-1]}</span>`).join('');};btn.onclick=roll;dv.textContent=faces[0];})();
+// Image drag
+(function(){
+    const uz = document.getElementById('uz');
+    
+    ['dragenter','dragover','dragleave','drop'].forEach(function(evt){
+        document.addEventListener(evt, function(e){
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    });
+    
+    uz.addEventListener('dragover', function(){
+        uz.classList.add('drag');
+    });
+    
+    uz.addEventListener('dragleave', function(){
+        uz.classList.remove('drag');
+    });
+    
+    uz.addEventListener('drop', function(e){
+        this.classList.remove('drag');
+        const file = e.dataTransfer.files[0];
+        
+        if(file && file.type.startsWith('image/')){
+            const reader = new FileReader();
+            
+            reader.onload = function(ev){
+                const newWin = window.open(
+                    '',
+                    '_blank',
+                    'width=800,height=600,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes'
+                );
+                
+                if(!newWin){
+                    alert('Please allow pop-ups');
+                    return;
+                }
+                
+                newWin.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Image</title>
+                        <style>
+                            *{margin:0;padding:0}
+                            body{
+                                background:#0a0a0f;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                                min-height:100vh
+                            }
+                            img{
+                                max-width:95vw;
+                                max-height:95vh;
+                                border-radius:12px;
+                                box-shadow:0 20px 60px rgba(0,0,0,.8)
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <img src="${ev.target.result}">
+                    </body>
+                    </html>
+                `);
+                newWin.document.close();
+            };
+            
+            reader.readAsDataURL(file);
+        } else {
+            alert('Please drop an image file');
+        }
+    });
+})();
 
-// 待办（localStorage）
-(function(){const input=document.getElementById('tinput'),add=document.getElementById('tadd'),list=document.getElementById('tl');const KEY='todo_list_data';let todos=[];const load=()=>{try{const raw=localStorage.getItem(KEY);if(raw)todos=JSON.parse(raw);}catch(e){todos=[];}};const save=()=>{localStorage.setItem(KEY,JSON.stringify(todos));};const render=()=>{list.innerHTML='';if(!todos.length){list.innerHTML='<li style="justify-content:center;opacity:.4;font-size:.8rem;">暂无任务</li>';return;}todos.forEach((todo,idx)=>{const li=document.createElement('li');const tx=document.createElement('span');tx.className='tx'+(todo.done?' done':'');tx.textContent=todo.text;tx.onclick=()=>{todos[idx].done=!todos[idx].done;save();render();};const dl=document.createElement('button');dl.className='dl';dl.textContent='×';dl.onclick=e=>{e.stopPropagation();todos.splice(idx,1);save();render();};li.appendChild(tx);li.appendChild(dl);list.appendChild(li);});};const addTodo=()=>{const text=input.value.trim();if(!text){alert('请输入任务');return;}todos.push({id:Date.now(),text,done:false});save();render();input.value='';};load();render();add.onclick=addTodo;input.onkeydown=e=>{if(e.key==='Enter')addTodo();};})();
+// Stopwatch
+(function(){
+    const dp = document.getElementById('tdp');
+    let timer = null;
+    let sec = 0;
+    
+    const fmt = function(s){
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const sec = s % 60;
+        
+        if(h > 0){
+            return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+        }
+        return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    };
+    
+    const upd = function(){
+        dp.textContent = fmt(sec);
+    };
+    
+    const start = function(){
+        if(timer) return;
+        timer = setInterval(function(){
+            sec++;
+            upd();
+        }, 1000);
+    };
+    
+    const pause = function(){
+        clearInterval(timer);
+        timer = null;
+    };
+    
+    const reset = function(){
+        pause();
+        sec = 0;
+        upd();
+    };
+    
+    document.getElementById('tst').onclick = start;
+    document.getElementById('tsp').onclick = pause;
+    document.getElementById('trs').onclick = reset;
+    upd();
+})();
+
+// Dice
+(function(){
+    const dv = document.getElementById('dv');
+    const dh = document.getElementById('dh');
+    const btn = document.getElementById('dbn');
+    
+    const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+    const history = [];
+    
+    const roll = function(){
+        dv.classList.remove('roll');
+        void dv.offsetWidth;
+        dv.classList.add('roll');
+        
+        const result = Math.floor(Math.random() * 6) + 1;
+        dv.textContent = faces[result - 1];
+        
+        history.push(result);
+        if(history.length > 5) history.shift();
+        
+        dh.innerHTML = history
+            .map(function(n){ return `<span>${faces[n-1]}</span>`; })
+            .join('');
+    };
+    
+    btn.onclick = roll;
+    dv.textContent = faces[0];
+})();
+
+// Todo list
+(function(){
+    const input = document.getElementById('tinput');
+    const addBtn = document.getElementById('tadd');
+    const list = document.getElementById('tl');
+    
+    const STORAGE_KEY = 'todo_list_data';
+    let todos = [];
+    
+    const load = function(){
+        try{
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if(raw) todos = JSON.parse(raw);
+        } catch(e){
+            todos = [];
+        }
+    };
+    
+    const save = function(){
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+    };
+    
+    const render = function(){
+        list.innerHTML = '';
+        
+        if(!todos.length){
+            list.innerHTML = 
+                '<li style="justify-content:center;opacity:.4;font-size:.8rem;">No tasks</li>';
+            return;
+        }
+        
+        todos.forEach(function(todo, idx){
+            const li = document.createElement('li');
+            
+            const tx = document.createElement('span');
+            tx.className = 'tx' + (todo.done ? ' done' : '');
+            tx.textContent = todo.text;
+            tx.onclick = function(){
+                todos[idx].done = !todos[idx].done;
+                save();
+                render();
+            };
+            
+            const dl = document.createElement('button');
+            dl.className = 'dl';
+            dl.textContent = '×';
+            dl.onclick = function(e){
+                e.stopPropagation();
+                todos.splice(idx, 1);
+                save();
+                render();
+            };
+            
+            li.appendChild(tx);
+            li.appendChild(dl);
+            list.appendChild(li);
+        });
+    };
+    
+    const addTodo = function(){
+        const text = input.value.trim();
+        if(!text){
+            alert('Please enter a task');
+            return;
+        }
+        
+        todos.push({
+            id: Date.now(),
+            text: text,
+            done: false
+        });
+        
+        save();
+        render();
+        input.value = '';
+    };
+    
+    load();
+    render();
+    addBtn.onclick = addTodo;
+    
+    input.onkeydown = function(e){
+        if(e.key === 'Enter') addTodo();
+    };
+})();
+
+// Unit Converter
+(function(){
+    const units = {
+        length: [
+            {name:'Meter', rate:1},
+            {name:'Kilometer', rate:1000},
+            {name:'Centimeter', rate:0.01},
+            {name:'Foot', rate:0.3048},
+            {name:'Inch', rate:0.0254},
+            {name:'Mile', rate:1609.344}
+        ],
+        weight: [
+            {name:'Kilogram', rate:1},
+            {name:'Gram', rate:0.001},
+            {name:'Pound', rate:0.453592},
+            {name:'Ounce', rate:0.0283495},
+            {name:'Ton', rate:1000}
+        ]
+    };
+
+    const sel1 = document.getElementById('unitSel1');
+    const sel2 = document.getElementById('unitSel2');
+    const val1 = document.getElementById('unitVal1');
+    const val2 = document.getElementById('unitVal2');
+
+    window.updateUnitOptions = function(){
+        const type = document.getElementById('unitType').value;
+        const list = units[type];
+        
+        sel1.innerHTML = '';
+        sel2.innerHTML = '';
+        
+        list.forEach(function(u, i){
+            sel1.innerHTML += `<option value="${u.rate}">${u.name}</option>`;
+            sel2.innerHTML += `<option value="${u.rate}">${u.name}</option>`;
+        });
+        
+        sel2.selectedIndex = 1;
+        convertUnit(1);
+    };
+
+    window.convertUnit = function(from){
+        if(from === 1){
+            const v = parseFloat(val1.value) || 0;
+            const r = parseFloat(sel1.value) / parseFloat(sel2.value);
+            val2.value = (v * r).toFixed(4);
+        } else {
+            const v = parseFloat(val2.value) || 0;
+            const r = parseFloat(sel2.value) / parseFloat(sel1.value);
+            val1.value = (v * r).toFixed(4);
+        }
+    };
+
+    window.swapUnits = function(){
+        const tmp = sel1.selectedIndex;
+        sel1.selectedIndex = sel2.selectedIndex;
+        sel2.selectedIndex = tmp;
+        convertUnit(1);
+    };
+
+    updateUnitOptions();
+})();
+
+// Sticky Notes
+(function(){
+    const textarea = document.getElementById('noteText');
+    const status = document.getElementById('noteStatus');
+    const STORAGE_KEY = 'sticky_note_content';
+    let saveTimer = null;
+
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved) textarea.value = saved;
+
+    textarea.addEventListener('input', function(){
+        status.textContent = 'Saving...';
+        clearTimeout(saveTimer);
+        
+        saveTimer = setTimeout(function(){
+            localStorage.setItem(STORAGE_KEY, textarea.value);
+            status.textContent = 'Auto-saved';
+        }, 800);
+    });
+})();
+
+// Countdown Timer
+(function(){
+    const display = document.getElementById('cdDisplay');
+    const minInput = document.getElementById('cdMin');
+    const secInput = document.getElementById('cdSec');
+    const btnStart = document.getElementById('cdStart');
+    const btnPause = document.getElementById('cdPause');
+    const btnReset = document.getElementById('cdReset');
+    
+    let timer = null;
+    let totalSec = 0;
+
+    const fmt = function(s){
+        const m = Math.floor(s / 60);
+        const sec = s % 60;
+        return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    };
+
+    const getInputSec = function(){
+        const m = parseInt(minInput.value) || 0;
+        const s = parseInt(secInput.value) || 0;
+        return m * 60 + s;
+    };
+
+    const updateDisplay = function(){
+        display.textContent = fmt(totalSec);
+    };
+
+    const start = function(){
+        if(timer) return;
+        if(totalSec <= 0) totalSec = getInputSec();
+        if(totalSec <= 0) return;
+        
+        timer = setInterval(function(){
+            totalSec--;
+            updateDisplay();
+            
+            if(totalSec <= 0){
+                clearInterval(timer);
+                timer = null;
+                alert('Time is up!');
+            }
+        }, 1000);
+    };
+
+    const pause = function(){
+        clearInterval(timer);
+        timer = null;
+    };
+
+    const reset = function(){
+        pause();
+        totalSec = getInputSec();
+        updateDisplay();
+    };
+
+    btnStart.onclick = start;
+    btnPause.onclick = pause;
+    btnReset.onclick = reset;
+    
+    totalSec = getInputSec();
+    updateDisplay();
+})();
+
+// Music Player
+(function(){
+    const fileInput = document.getElementById('musicFile');
+    const nameEl = document.getElementById('musicName');
+    const progressBar = document.getElementById('musicProgressBar');
+    const progressEl = document.getElementById('musicProgress');
+    const currentEl = document.getElementById('musicCurrent');
+    const totalEl = document.getElementById('musicTotal');
+    const playBtn = document.getElementById('musicPlay');
+    const pauseBtn = document.getElementById('musicPause');
+    const volumeInput = document.getElementById('musicVolume');
+    
+    const audio = new Audio();
+    audio.volume = 0.8;
+
+    const fmtTime = function(sec){
+        if(isNaN(sec)) return '00:00';
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
+        return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    };
+
+    fileInput.addEventListener('change', function(e){
+        const file = e.target.files[0];
+        if(!file) return;
+        
+        const url = URL.createObjectURL(file);
+        audio.src = url;
+        nameEl.textContent = file.name;
+        
+        audio.addEventListener('loadedmetadata', function(){
+            totalEl.textContent = fmtTime(audio.duration);
+        });
+    });
+
+    audio.addEventListener('timeupdate', function(){
+        const percent = (audio.currentTime / audio.duration) * 100 || 0;
+        progressBar.style.width = percent + '%';
+        currentEl.textContent = fmtTime(audio.currentTime);
+    });
+
+    progressEl.addEventListener('click', function(e){
+        if(!audio.duration) return;
+        const rect = progressEl.getBoundingClientRect();
+        const percent = (e.clientX - rect.left) / rect.width;
+        audio.currentTime = percent * audio.duration;
+    });
+
+    playBtn.addEventListener('click', function(){
+        if(!audio.src) {
+            alert('Please select an audio file first');
+            return;
+        }
+        audio.play();
+    });
+
+    pauseBtn.addEventListener('click', function(){
+        audio.pause();
+    });
+
+    volumeInput.addEventListener('input', function(){
+        audio.volume = this.value / 100;
+    });
+})();
+
+// Password Generator
+(function(){
+    const output = document.getElementById('passOutput');
+    const lengthInput = document.getElementById('passLength');
+    const upperCheck = document.getElementById('passUpper');
+    const lowerCheck = document.getElementById('passLower');
+    const numberCheck = document.getElementById('passNumber');
+    const symbolCheck = document.getElementById('passSymbol');
+    const generateBtn = document.getElementById('passGenerate');
+    const copyBtn = document.getElementById('passCopy');
+
+    const charSets = {
+        upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        lower: 'abcdefghijklmnopqrstuvwxyz',
+        number: '0123456789',
+        symbol: '!@#$%^&*()_+-=[]{}|;:,.<>?'
+    };
+
+    const generate = function(){
+        let chars = '';
+        if(upperCheck.checked) chars += charSets.upper;
+        if(lowerCheck.checked) chars += charSets.lower;
+        if(numberCheck.checked) chars += charSets.number;
+        if(symbolCheck.checked) chars += charSets.symbol;
+        
+        if(!chars){
+            alert('Please select at least one character type');
+            return;
+        }
+        
+        const len = parseInt(lengthInput.value) || 16;
+        let result = '';
+        
+        for(let i = 0; i < len; i++){
+            const idx = Math.floor(Math.random() * chars.length);
+            result += chars[idx];
+        }
+        
+        output.textContent = result;
+    };
+
+    const copy = function(){
+        const text = output.textContent;
+        if(!text || text === 'Click generate') return;
+        
+        navigator.clipboard.writeText(text).then(function(){
+            copyBtn.textContent = 'Copied!';
+            setTimeout(function(){
+                copyBtn.textContent = 'Copy';
+            }, 1500);
+        });
+    };
+
+    generateBtn.onclick = generate;
+    copyBtn.onclick = copy;
+})();
 </script>
 </body>
 </html>
