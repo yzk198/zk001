@@ -1,46 +1,51 @@
-# Glassmorphism Toolbox
+# Glass Toolbox
 
-A lightweight, browser-based desktop-style tool dashboard with glassmorphism design. All tools run locally in your browser, no backend server required.
+A lightweight glassmorphism desktop toolbox built with pure HTML, CSS and JavaScript.
+一款纯 HTML、CSS、JavaScript 实现的毛玻璃风格轻量化工具箱。
 
-## Introduction
+## ✨ Features / 功能列表
 
-This project is a lightweight desktop-style tool panel running in the browser with glassmorphism design. All tools run locally in your browser without a backend. The main control panel stays visible, other tools are hidden by default and can be opened by clicking hyperlinks. All tool windows support free dragging.
+- Image preview (drag & drop) | 拖拽图片预览
+- Calendar panel | 日历面板
+- Stopwatch | 秒表
+- Dice roller with history | 骰子（带投掷记录）
+- Todo list (localStorage save) | 待办清单（本地持久化）
+- Unit converter (length, weight) | 单位换算器（长度、重量）
+- Auto-save note | 自动保存便签
+- Countdown timer | 倒计时
+- Local audio player | 本地音频播放器
+- Password generator | 密码生成器
+- 15×15 Gomoku game with simple AI | 15×15 五子棋（简易 AI 对手）
+- Personalized interface settings | 界面个性化设置
+  - Custom gradient background colors | 自定义渐变背景色
+  - Adjust glass transparency | 调节毛玻璃透明度
+  - Adjust blur intensity | 调节模糊强度
+  - Custom panel border color | 自定义面板边框颜色
+  - One-click restore default style | 一键恢复默认样式
 
-## Features
+## 📌 Introduction / 简介
 
-### Main Control Center (Always Visible)
+All tools run locally in browser, **no backend, no network request**.
+所有工具在浏览器本地运行，**无后端、不发起网络请求**。
 
-- Image drag & drop viewer: Drop an image to open it in a new browser tab
-- Interactive calendar: Switch months, select and display the chosen date
-- Stopwatch: Start, pause and reset timer
+All configuration and data are saved in `localStorage`, data will not be lost after refreshing the page.
+所有配置与数据存储在 `localStorage`，刷新页面数据不会丢失。
 
-### Extra Tools (Opened by clicking hyperlinks)
+The whole UI adopts glassmorphism style, floating draggable windows.
+Full interface text in English.
+整体界面采用毛玻璃设计，工具为可拖拽浮动窗口。界面文字全部为英文。
 
-- 🎲 Dice Roller: Animated dice roll with roll history
-- 📋 Todo List: Add, complete and delete tasks; data saved locally
-- 📏 Unit Converter: Length & weight unit conversion, one-click swap conversion direction
-- 📝 Sticky Note: Auto-saved local text note
-- ⏱ Countdown Timer: Custom minutes & seconds, alert popup when finished
-- 🎵 Music Player: Load local audio files, playback control, progress bar and volume slider
-- 🔑 Password Generator: Custom password length, toggle character types, one-click copy password
+## 🚀 How to use / 使用方法
 
-## Tech Stack
+1. Download the HTML file
+下载 HTML 文件
+2. Open it directly with any modern browser (Chrome, Edge, Firefox etc.)
+使用任意现代浏览器直接打开（Chrome、Edge、Firefox 等）
+3. Click tool buttons on the sidebar to open floating windows
+点击侧边工具按钮打开浮动窗口
+4. Open `Setting` to customize the visual style
+打开设置面板自定义界面样式
 
-- HTML
-- CSS (Glassmorphism style with backdrop-filter blur)
-- Vanilla JavaScript
-- LocalStorage: Store todo items and note data
-
-## How to Use
-
-1. Copy all source code and save it as an `.html` file (e.g. `toolbox.html`)
-2. Open the file with any modern browser (Chrome, Edge, Firefox, Safari)
-3. Use image drag, calendar and stopwatch directly on main control center
-4. Click hyperlinks at the bottom of control center to open tool windows
-5. Drag window header to move floating windows; click `✕` or re-click hyperlink to close
-
-## Notes
-
-1. All data is stored in browser LocalStorage. Clearing browser cache will erase todos and notes.
-2. The music player only loads local audio files and will not upload data to any server.
-3. If popups are blocked by browser, please allow popup permission for this page.
+> 
+> No installation required.
+> 无需安装。
